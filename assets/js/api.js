@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:9550";
+const API_BASE = "http://160.191.87.150:9550";
 
 let _cache = null;
 
