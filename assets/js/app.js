@@ -86,27 +86,21 @@ function createProfileEffectWrap(effects, cls) {
 
 // ─── Discord profile mockup ────────────────────────────
 
-const USER_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 4v1h16v-1c0-1.33-2.67-4-8-4z"/></svg>`;
-
 function createDiscordProfileMock(decor, forCard = false) {
-    // TYPE 0: avatar circle behind decoration
+    // TYPE 0: avatar.png template + decoration overlay
     if (decor.type === 0) {
         const wrap = document.createElement("div");
         wrap.className = "dp-avatar-preview";
 
-        const avatarBg = document.createElement("div");
-        avatarBg.className = "dp-avatar-base";
-
-        const iconWrap = document.createElement("div");
-        iconWrap.className = "dp-avatar-icon";
-        iconWrap.innerHTML = USER_ICON_SVG;
-        avatarBg.appendChild(iconWrap);
+        const base = document.createElement("img");
+        base.src = "assets/img/avatar.png";
+        base.className = "dp-avatar-base-img";
+        base.alt = "";
+        wrap.appendChild(base);
 
         const status = document.createElement("span");
         status.className = "dp-status--avatar";
-        avatarBg.appendChild(status);
-
-        wrap.appendChild(avatarBg);
+        wrap.appendChild(status);
 
         if (decor.assetURL) {
             const deco = document.createElement("img");
@@ -119,7 +113,7 @@ function createDiscordProfileMock(decor, forCard = false) {
         return wrap;
     }
 
-    // TYPE 2: Discord DM-list style with nameplate row
+    // TYPE 2: nameplate.png as avatar in DM-list chat row
     if (decor.type === 2) {
         const wrap = document.createElement("div");
         wrap.className = "dp-chat-preview";
@@ -127,11 +121,9 @@ function createDiscordProfileMock(decor, forCard = false) {
         const dimRow = (lineWidths) => {
             const row = document.createElement("div");
             row.className = "dp-chat-row dp-chat-row--dim";
-
             const av = document.createElement("div");
             av.className = "dp-chat-av dp-chat-av--dim";
             row.appendChild(av);
-
             const linesWrap = document.createElement("div");
             linesWrap.className = "dp-chat-lines";
             lineWidths.forEach((w) => {
@@ -146,16 +138,15 @@ function createDiscordProfileMock(decor, forCard = false) {
 
         wrap.appendChild(dimRow(["65%", "40%"]));
 
-        // Nameplate row
         const mainRow = document.createElement("div");
         mainRow.className = "dp-chat-row dp-chat-row--main";
 
         const mainAv = document.createElement("div");
         mainAv.className = "dp-chat-av dp-chat-av--main";
-        const avIcon = document.createElement("div");
-        avIcon.className = "dp-avatar-icon";
-        avIcon.innerHTML = USER_ICON_SVG;
-        mainAv.appendChild(avIcon);
+        const avImg = document.createElement("img");
+        avImg.src = "assets/img/nameplate.png";
+        avImg.alt = "";
+        mainAv.appendChild(avImg);
         const avStatus = document.createElement("span");
         avStatus.className = "dp-status";
         mainAv.appendChild(avStatus);
@@ -184,90 +175,37 @@ function createDiscordProfileMock(decor, forCard = false) {
         return wrap;
     }
 
-    // TYPE 1: full profile popup
-    const hasEffects = decor.effects && decor.effects.length;
+    // TYPE 1: profile.png template + effect layer (multiply blend makes white transparent)
+    const preview = document.createElement("div");
+    preview.className = "dp-profile-preview";
 
-    const mock = document.createElement("div");
-    mock.className = "discord-profile-mock";
-
-    if (hasEffects) {
-        const effectBg = createProfileEffectWrap(decor.effects, "");
-        effectBg.style.cssText = "position:absolute;inset:0;overflow:hidden;z-index:0;";
-        mock.appendChild(effectBg);
-
-        const overlay = document.createElement("div");
-        overlay.className = "dp-effect-overlay";
-        mock.appendChild(overlay);
-    }
-
-    const banner = document.createElement("div");
-    banner.className = hasEffects ? "dp-banner dp-banner--transparent" : "dp-banner";
-    if (!hasEffects && decor.staticURL) {
+    const effectLayer = document.createElement("div");
+    effectLayer.className = "dp-effect-layer";
+    if (decor.effects && decor.effects.length) {
+        const effectWrap = createProfileEffectWrap(decor.effects, "");
+        effectWrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
+        effectLayer.appendChild(effectWrap);
+    } else if (decor.staticURL) {
         const img = document.createElement("img");
         img.src = decor.staticURL;
         img.alt = "";
         img.style.cssText = "width:100%;height:100%;object-fit:cover;";
-        banner.appendChild(img);
+        effectLayer.appendChild(img);
     }
-    mock.appendChild(banner);
+    preview.appendChild(effectLayer);
 
-    const body = document.createElement("div");
-    body.className = hasEffects ? "dp-body dp-body--elevated" : "dp-body";
+    const profileImg = document.createElement("img");
+    profileImg.src = "assets/img/profile.png";
+    profileImg.className = "dp-profile-base";
+    profileImg.alt = "";
+    preview.appendChild(profileImg);
 
-    const avatarRow = document.createElement("div");
-    avatarRow.className = "dp-avatar-row";
-
-    const avatar = document.createElement("div");
-    avatar.className = "dp-avatar";
-    const iconWrap = document.createElement("div");
-    iconWrap.className = "dp-avatar-icon";
-    iconWrap.innerHTML = USER_ICON_SVG;
-    avatar.appendChild(iconWrap);
-    const status = document.createElement("span");
-    status.className = "dp-status";
-    avatar.appendChild(status);
-    avatarRow.appendChild(avatar);
-    body.appendChild(avatarRow);
-
-    const nameSection = document.createElement("div");
-    nameSection.className = "dp-name-section";
-    const username = document.createElement("span");
-    username.className = "dp-username";
-    username.textContent = "DiscordUser";
-    nameSection.appendChild(username);
-    const tag = document.createElement("span");
-    tag.className = "dp-tag";
-    tag.textContent = "#0000";
-    nameSection.appendChild(tag);
-    body.appendChild(nameSection);
-
-    const about = document.createElement("div");
-    about.className = "dp-about";
-    const aboutTitle = document.createElement("div");
-    aboutTitle.className = "dp-about-title";
-    aboutTitle.textContent = "Giới thiệu";
-    about.appendChild(aboutTitle);
-    const lines = document.createElement("div");
-    lines.className = "dp-about-lines";
-    [100, 72].forEach((w) => {
-        const line = document.createElement("div");
-        line.className = "dp-about-line";
-        line.style.width = w + "%";
-        lines.appendChild(line);
-    });
-    about.appendChild(lines);
-    body.appendChild(about);
-    mock.appendChild(body);
-
-    // Card: wrap in square crop container to show only the top portion
-    if (forCard) {
-        const crop = document.createElement("div");
-        crop.className = "dp-profile-crop";
-        crop.appendChild(mock);
-        return crop;
-    }
-
-    return mock;
+    const crop = document.createElement("div");
+    crop.className = forCard
+        ? "dp-profile-crop"
+        : "dp-profile-crop dp-profile-crop--modal";
+    crop.appendChild(preview);
+    return crop;
 }
 
 // ─── Card rendering ────────────────────────────────────

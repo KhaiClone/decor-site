@@ -922,9 +922,6 @@ body.modal-open { overflow: hidden; }
     border-radius: 10px;
     overflow: hidden;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 #modalImgSlot .dp-avatar-preview {
@@ -932,49 +929,73 @@ body.modal-open { overflow: hidden; }
     border-radius: var(--radius);
 }
 
-.dp-avatar-base {
+.dp-avatar-base-img {
     position: absolute;
-    width: 46%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #5865f2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.45);
-    z-index: 0;
-}
-
-.dp-avatar-base .dp-avatar-icon {
-    width: 55%;
-    height: 55%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8%;
+    box-sizing: border-box;
 }
 
 .dp-status--avatar {
-    width: 22%;
-    height: 22%;
+    width: 8%;
+    height: 8%;
     background: #23a55a;
     border-radius: 50%;
     border: 2px solid var(--surface);
     position: absolute;
-    bottom: 4%;
-    right: 4%;
+    bottom: 16%;
+    right: 16%;
+    z-index: 2;
 }
 
 .dp-deco-img {
     position: absolute;
-    width: 88%;
-    height: 88%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    padding: 4%;
+    box-sizing: border-box;
     z-index: 1;
 }
 
-/* ─── Profile effect square crop (type 1 card) ─────────── */
+/* ─── Profile effect template preview (type 1) ─────────── */
+.dp-profile-preview {
+    width: 100%;
+    position: relative;
+    background: #ffffff;
+}
+
+.dp-profile-base {
+    width: 100%;
+    display: block;
+    mix-blend-mode: multiply;
+    position: relative;
+    z-index: 1;
+}
+
+.dp-effect-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
 .dp-profile-crop {
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
     border-radius: 10px;
+}
+
+.dp-profile-crop--modal {
+    aspect-ratio: 4/5;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
 }
 
 /* ─── Nameplate chat preview (type 2) ──────────────────── */
@@ -1031,17 +1052,16 @@ body.modal-open { overflow: hidden; }
 
 .dp-chat-av--main {
     width: 19%;
-    background: #5865f2;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.45);
+    overflow: hidden;
 }
 
-.dp-chat-av--main .dp-avatar-icon {
-    width: 55%;
-    height: 55%;
+.dp-chat-av--main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
 }
 
 .dp-chat-av--main .dp-status {
