@@ -1,10 +1,10 @@
 const ITEMS_PER_PAGE = 24;
 
 const TYPE_INFO = {
-    0:    { label: "Avatar Deco",    color: "avatar" },
-    1:    { label: "Profile Effect", color: "profile" },
-    2:    { label: "Nameplate",      color: "nameplate" },
-    1000: { label: "Bundle",         color: "bundle" },
+    0: { label: "Avatar Deco", color: "avatar" },
+    1: { label: "Profile Effect", color: "profile" },
+    2: { label: "Nameplate", color: "nameplate" },
+    1000: { label: "Bundle", color: "bundle" },
 };
 
 let allDecors = [];
@@ -14,15 +14,15 @@ let currentFilter = "all";
 let searchQuery = "";
 
 const $ = (id) => document.getElementById(id);
-const grid        = $("grid");
-const pagination  = $("pagination");
+const grid = $("grid");
+const pagination = $("pagination");
 const searchInput = $("searchInput");
-const totalCount  = $("totalCount");
+const totalCount = $("totalCount");
 const loadingState = $("loadingState");
-const errorState   = $("errorState");
-const emptyState   = $("emptyState");
-const modal        = $("modal");
-const modalClose   = $("modalClose");
+const errorState = $("errorState");
+const emptyState = $("emptyState");
+const modal = $("modal");
+const modalClose = $("modalClose");
 const modalContent = $("modalContent");
 
 // ─── Helpers ──────────────────────────────────────────
@@ -43,12 +43,12 @@ function createBundleImgWrap(assetURL, cls) {
     base.src = assetURL[0];
     base.className = "bundle-img-base";
     base.alt = "";
-    const overlay = document.createElement("img");
+    /* const overlay = document.createElement("img");
     overlay.src = assetURL[1];
     overlay.className = "bundle-img-overlay";
-    overlay.alt = "";
+    overlay.alt = ""; */
     wrap.appendChild(base);
-    wrap.appendChild(overlay);
+    /* wrap.appendChild(overlay); */
     return wrap;
 }
 
@@ -57,7 +57,8 @@ function createBundleImgWrap(assetURL, cls) {
 function createProfileEffectWrap(effects, cls) {
     const wrap = document.createElement("div");
     wrap.className = cls;
-    wrap.style.cssText = "position:relative;width:100%;height:100%;overflow:hidden;";
+    wrap.style.cssText =
+        "position:relative;width:100%;height:100%;overflow:hidden;";
 
     if (!effects || !effects.length) return wrap;
 
@@ -73,7 +74,9 @@ function createProfileEffectWrap(effects, cls) {
         setTimeout(() => {
             img.style.opacity = "1";
             if (!effect.loop) {
-                setTimeout(() => { img.style.opacity = "0"; }, effect.duration);
+                setTimeout(() => {
+                    img.style.opacity = "0";
+                }, effect.duration);
             }
         }, effect.start);
     });
@@ -84,7 +87,10 @@ function createProfileEffectWrap(effects, cls) {
 // ─── Card rendering ────────────────────────────────────
 
 function renderCard(decor) {
-    const typeInfo = TYPE_INFO[decor.type] ?? { label: "Unknown", color: "avatar" };
+    const typeInfo = TYPE_INFO[decor.type] ?? {
+        label: "Unknown",
+        color: "avatar",
+    };
     const isBundle = decor.type === 1000 && Array.isArray(decor.assetURL);
 
     const card = document.createElement("div");
@@ -96,10 +102,17 @@ function renderCard(decor) {
     imgWrap.className = "card-img-wrap";
 
     if (isBundle) {
-        imgWrap.appendChild(createBundleImgWrap(decor.assetURL, "bundle-img-wrap"));
+        imgWrap.appendChild(
+            createBundleImgWrap(decor.assetURL, "bundle-img-wrap"),
+        );
     } else if (decor.type === 1) {
         if (decor.effects && decor.effects.length) {
-            imgWrap.appendChild(createProfileEffectWrap(decor.effects, "profile-effect-wrap card-img"));
+            imgWrap.appendChild(
+                createProfileEffectWrap(
+                    decor.effects,
+                    "profile-effect-wrap card-img",
+                ),
+            );
         } else {
             const img = document.createElement("img");
             img.src = decor.staticURL;
@@ -240,7 +253,11 @@ function renderPagination(total) {
 
 function getPageRange(current, total) {
     const set = new Set([1, total]);
-    for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
+    for (
+        let i = Math.max(1, current - 2);
+        i <= Math.min(total, current + 2);
+        i++
+    ) {
         set.add(i);
     }
     return [...set].sort((a, b) => a - b);
@@ -249,14 +266,15 @@ function getPageRange(current, total) {
 // ─── Modal ─────────────────────────────────────────────
 
 function buildPricesHTML(decor) {
-    const isBundle   = decor.type === 1000;
+    const isBundle = decor.type === 1000;
     const isImported = decor.decorFrom === "importedDecors";
     const sp = decor.sellingPrices || {};
 
     const row = (label, origVal, sellVal, noGift = false) => {
-        const orig = origVal != null
-            ? `<span class="price-original">${formatMoney(origVal)}</span><span class="price-arrow">→</span>`
-            : "";
+        const orig =
+            origVal != null
+                ? `<span class="price-original">${formatMoney(origVal)}</span><span class="price-arrow">→</span>`
+                : "";
         const sell = noGift
             ? `<span class="price-limited">Decor giới hạn không có Gift</span>`
             : `<span class="price-sell">${formatMoney(sellVal)}</span>`;
@@ -269,28 +287,47 @@ function buildPricesHTML(decor) {
 
     if (isBundle) {
         return [
-            row("🔵 Login (Có Nitro)",    decor.prices?.withNitro,    sp.loginWithNitro),
-            row("⚪ Login (Không Nitro)", decor.prices?.withoutNitro, sp.loginWithoutNitro),
-            row("🎁 Gift Bundle",         null, sp.giftBundle, isImported),
+            row(
+                "🔵 Login (Có Nitro)",
+                decor.prices?.withNitro,
+                sp.loginWithNitro,
+            ),
+            row(
+                "⚪ Login (Không Nitro)",
+                decor.prices?.withoutNitro,
+                sp.loginWithoutNitro,
+            ),
+            row("🎁 Gift Bundle", null, sp.giftBundle, isImported),
         ].join("");
     }
 
     return [
-        row("🔵 Login (Có Nitro)",    decor.prices?.withNitro,    sp.loginWithNitro),
-        row("⚪ Login (Không Nitro)", decor.prices?.withoutNitro, sp.loginWithoutNitro),
-        row("🎁 Gift",               decor.prices?.withNitro,    sp.gift, isImported),
+        row("🔵 Login (Có Nitro)", decor.prices?.withNitro, sp.loginWithNitro),
+        row(
+            "⚪ Login (Không Nitro)",
+            decor.prices?.withoutNitro,
+            sp.loginWithoutNitro,
+        ),
+        row("🎁 Gift", decor.prices?.withNitro, sp.gift, isImported),
     ].join("");
 }
 
 function buildBundleItemsHTML(decor) {
-    if (decor.type !== 1000 || !Array.isArray(decor.items) || decor.items.length === 0) {
+    if (
+        decor.type !== 1000 ||
+        !Array.isArray(decor.items) ||
+        decor.items.length === 0
+    ) {
         return "";
     }
 
     const rows = decor.items
         .filter(Boolean)
         .map((item) => {
-            const t = TYPE_INFO[item.type] ?? { label: "Unknown", color: "avatar" };
+            const t = TYPE_INFO[item.type] ?? {
+                label: "Unknown",
+                color: "avatar",
+            };
             return `<li class="bundle-item">
                 <span class="badge badge-${t.color} badge-sm">${t.label}</span>
                 <span>${item.name}</span>
@@ -306,8 +343,11 @@ function buildBundleItemsHTML(decor) {
 }
 
 function openModal(decor) {
-    const typeInfo   = TYPE_INFO[decor.type] ?? { label: "Unknown", color: "avatar" };
-    const isBundle   = decor.type === 1000 && Array.isArray(decor.assetURL);
+    const typeInfo = TYPE_INFO[decor.type] ?? {
+        label: "Unknown",
+        color: "avatar",
+    };
+    const isBundle = decor.type === 1000 && Array.isArray(decor.assetURL);
     const isImported = decor.decorFrom === "importedDecors";
 
     let imgNode;
@@ -317,7 +357,9 @@ function openModal(decor) {
         const wrap = document.createElement("div");
         wrap.className = "modal-img-wrap";
         if (decor.effects && decor.effects.length) {
-            wrap.appendChild(createProfileEffectWrap(decor.effects, "modal-img"));
+            wrap.appendChild(
+                createProfileEffectWrap(decor.effects, "modal-img"),
+            );
         } else {
             const img = document.createElement("img");
             img.src = decor.staticURL;
@@ -408,7 +450,9 @@ searchInput.addEventListener("input", (e) => {
 
 document.querySelectorAll(".filter-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+        document
+            .querySelectorAll(".filter-btn")
+            .forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         currentFilter = btn.dataset.type;
         applyFilters();
@@ -416,8 +460,12 @@ document.querySelectorAll(".filter-btn").forEach((btn) => {
 });
 
 modalClose.addEventListener("click", closeModal);
-modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+});
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+});
 
 // ─── Init ──────────────────────────────────────────────
 
