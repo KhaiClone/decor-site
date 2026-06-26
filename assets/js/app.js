@@ -158,6 +158,10 @@ function createDiscordProfileMock(decor, forCard = false) {
         npAv.appendChild(avImg);
         npArea.appendChild(npAv);
 
+        const npName = document.createElement("div");
+        npName.className = "dp-nameplate-name";
+        npArea.appendChild(npName);
+
         mainRow.appendChild(npArea);
 
         wrap.appendChild(mainRow);

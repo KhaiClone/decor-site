@@ -1108,6 +1108,15 @@ body.modal-open { overflow: hidden; }
     border-color: transparent;
 }
 
+.dp-nameplate-name {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    height: 28%;
+    background: #706f74;
+    border-radius: 100px;
+}
+
 .dp-nameplate-pill {
     position: relative;
     z-index: 1;
