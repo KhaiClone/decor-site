@@ -1092,6 +1092,7 @@ body.modal-open { overflow: hidden; }
     aspect-ratio: 1;
     border-radius: 50%;
     overflow: hidden;
+    mix-blend-mode: multiply;
 }
 
 .dp-nameplate-av img {
@@ -1111,7 +1112,8 @@ body.modal-open { overflow: hidden; }
 .dp-nameplate-name {
     position: relative;
     z-index: 2;
-    flex: 1;
+    width: 50%;
+    flex-shrink: 0;
     height: 28%;
     background: #706f74;
     border-radius: 100px;
