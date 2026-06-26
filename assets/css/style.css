@@ -966,15 +966,22 @@ body.modal-open { overflow: hidden; }
 .dp-profile-preview {
     width: 100%;
     position: relative;
-    background: #ffffff;
+    background: #1e1f22;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#modalImgSlot .dp-profile-preview {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
 }
 
 .dp-profile-base {
     width: 100%;
     display: block;
-    mix-blend-mode: multiply;
     position: relative;
     z-index: 1;
+    opacity: 0.18;
 }
 
 .dp-effect-layer {
@@ -989,13 +996,6 @@ body.modal-open { overflow: hidden; }
     aspect-ratio: 1;
     overflow: hidden;
     border-radius: 10px;
-}
-
-.dp-profile-crop--modal {
-    aspect-ratio: 4/5;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
 }
 
 /* ─── Nameplate chat preview (type 2) ──────────────────── */

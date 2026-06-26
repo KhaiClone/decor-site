@@ -200,10 +200,10 @@ function createDiscordProfileMock(decor, forCard = false) {
     profileImg.alt = "";
     preview.appendChild(profileImg);
 
+    if (!forCard) return preview;
+
     const crop = document.createElement("div");
-    crop.className = forCard
-        ? "dp-profile-crop"
-        : "dp-profile-crop dp-profile-crop--modal";
+    crop.className = "dp-profile-crop";
     crop.appendChild(preview);
     return crop;
 }
