@@ -98,10 +98,6 @@ function createDiscordProfileMock(decor, forCard = false) {
         base.alt = "";
         wrap.appendChild(base);
 
-        const status = document.createElement("span");
-        status.className = "dp-status--avatar";
-        wrap.appendChild(status);
-
         if (decor.assetURL) {
             const deco = document.createElement("img");
             deco.src = decor.assetURL;
@@ -160,15 +156,7 @@ function createDiscordProfileMock(decor, forCard = false) {
         avImg.src = "assets/img/nameplate.png";
         avImg.alt = "";
         npAv.appendChild(avImg);
-        const avStatus = document.createElement("span");
-        avStatus.className = "dp-status";
-        npAv.appendChild(avStatus);
         npArea.appendChild(npAv);
-
-        const pill = document.createElement("span");
-        pill.className = "dp-nameplate-pill";
-        pill.textContent = "DiscordUser";
-        npArea.appendChild(pill);
 
         mainRow.appendChild(npArea);
 
