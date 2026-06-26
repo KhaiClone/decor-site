@@ -1112,7 +1112,7 @@ body.modal-open { overflow: hidden; }
     width: 50%;
     flex-shrink: 0;
     height: 28%;
-    background: rgba(97, 96, 99, 0.6);
+    background: rgba(97, 96, 99, 0.3);
     border-radius: 100px;
 }
 
