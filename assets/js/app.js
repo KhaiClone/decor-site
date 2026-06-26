@@ -68,7 +68,7 @@ function createProfileEffectWrap(effects, cls) {
         const img = document.createElement("img");
         img.src = effect.src;
         img.alt = "";
-        img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;`;
+        img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;transition:opacity 0.4s ease;`;
         wrap.appendChild(img);
 
         setTimeout(() => {
@@ -190,12 +190,17 @@ function createDiscordProfileMock(decor, forCard = false) {
 
     const loadAnimated = () => {
         effectLayer.innerHTML = "";
-        if (decor.effects && decor.effects.length) {
-            const wrap = createProfileEffectWrap(decor.effects, "");
-            wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
-            effectLayer.appendChild(wrap);
-        } else {
-            loadStatic();
+        if (!decor.effects || !decor.effects.length) { loadStatic(); return; }
+
+        const wrap = createProfileEffectWrap(decor.effects, "");
+        wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
+        effectLayer.appendChild(wrap);
+
+        const cycleDuration = Math.max(...decor.effects.map(e => (e.start || 0) + (e.duration || 0)));
+        if (cycleDuration > 0) {
+            setTimeout(() => {
+                if (effectLayer.contains(wrap)) loadAnimated();
+            }, cycleDuration + 300);
         }
     };
 
