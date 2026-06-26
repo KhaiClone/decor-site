@@ -63,24 +63,41 @@ function createProfileEffectWrap(effects, cls) {
     if (!effects || !effects.length) return wrap;
 
     const sorted = [...effects].sort((a, b) => a.zIndex - b.zIndex);
-
-    sorted.forEach((effect) => {
+    const entries = sorted.map((effect) => {
         const img = document.createElement("img");
         img.src = effect.src;
         img.alt = "";
         img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;transition:opacity 0.4s ease;`;
         wrap.appendChild(img);
-
-        setTimeout(() => {
-            img.style.opacity = "1";
-            if (!effect.loop) {
-                setTimeout(() => {
-                    img.style.opacity = "0";
-                }, effect.duration);
-            }
-        }, effect.start);
+        return { img, effect };
     });
 
+    const nonLoop = effects.filter(e => !e.loop);
+    const cycleEnd = nonLoop.length
+        ? Math.max(...nonLoop.map(e => (e.start || 0) + (e.duration || 0)))
+        : 0;
+
+    const playCycle = () => {
+        if (!wrap.isConnected) return;
+        entries.forEach(({ img, effect }) => {
+            img.style.opacity = "0";
+            setTimeout(() => {
+                if (!wrap.isConnected) return;
+                img.style.opacity = "1";
+                if (!effect.loop) {
+                    setTimeout(() => {
+                        if (!wrap.isConnected) return;
+                        img.style.opacity = "0";
+                    }, effect.duration);
+                }
+            }, effect.start);
+        });
+        if (cycleEnd > 0) {
+            setTimeout(() => playCycle(), cycleEnd + 500);
+        }
+    };
+
+    playCycle();
     return wrap;
 }
 
@@ -191,17 +208,9 @@ function createDiscordProfileMock(decor, forCard = false) {
     const loadAnimated = () => {
         effectLayer.innerHTML = "";
         if (!decor.effects || !decor.effects.length) { loadStatic(); return; }
-
         const wrap = createProfileEffectWrap(decor.effects, "");
         wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
         effectLayer.appendChild(wrap);
-
-        const cycleDuration = Math.max(...decor.effects.map(e => (e.start || 0) + (e.duration || 0)));
-        if (cycleDuration > 0) {
-            setTimeout(() => {
-                if (effectLayer.contains(wrap)) loadAnimated();
-            }, cycleDuration + 300);
-        }
     };
 
     loadStatic();
