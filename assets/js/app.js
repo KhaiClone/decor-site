@@ -371,6 +371,22 @@ function renderPagination(total) {
     }
 
     addBtn("→", currentPage + 1, currentPage === totalPages);
+
+    const goInput = document.createElement("input");
+    goInput.type = "number";
+    goInput.min = 1;
+    goInput.max = totalPages;
+    goInput.placeholder = currentPage;
+    goInput.className = "page-go-input";
+    goInput.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        const val = parseInt(goInput.value);
+        if (!val || val < 1 || val > totalPages) return;
+        currentPage = val;
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    pagination.appendChild(goInput);
 }
 
 function getPageRange(current, total) {

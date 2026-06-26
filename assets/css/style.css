@@ -531,6 +531,33 @@ body.modal-open {
     user-select: none;
 }
 
+.page-go-input {
+    width: 56px;
+    height: 38px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    text-align: center;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    margin-left: 6px;
+    -moz-appearance: textfield;
+}
+
+.page-go-input::-webkit-outer-spin-button,
+.page-go-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.page-go-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
 /* ─── Modal ─────────────────────────────────────────── */
 .modal-overlay {
     position: fixed;
