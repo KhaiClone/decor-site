@@ -918,7 +918,7 @@ body.modal-open { overflow: hidden; }
 .dp-avatar-preview {
     width: 100%;
     aspect-ratio: 1;
-    background: var(--surface);
+    background: #1e1f22;
     border-radius: 10px;
     overflow: hidden;
     position: relative;
@@ -1092,7 +1092,6 @@ body.modal-open { overflow: hidden; }
     aspect-ratio: 1;
     border-radius: 50%;
     overflow: hidden;
-    mix-blend-mode: multiply;
 }
 
 .dp-nameplate-av img {
@@ -1115,7 +1114,7 @@ body.modal-open { overflow: hidden; }
     width: 50%;
     flex-shrink: 0;
     height: 28%;
-    background: #706f74;
+    background: #616063;
     border-radius: 100px;
 }
 
