@@ -428,6 +428,17 @@ function buildBundleItemsHTML(decor) {
         </div>`;
 }
 
+function fallbackCopy(text, onSuccess) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0;";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); onSuccess(); } catch (_) {}
+    document.body.removeChild(ta);
+}
+
 function openModal(decor) {
     const typeInfo = TYPE_INFO[decor.type] ?? {
         label: "Unknown",
@@ -479,9 +490,16 @@ function openModal(decor) {
 
     const copyBtn = document.getElementById("shopCopyBtn");
     copyBtn.addEventListener("click", () => {
-        navigator.clipboard.writeText(`https://discord.com/shop#itemSkuId=${decor.sku_id}`);
-        copyBtn.textContent = "Đã sao chép ✓";
-        setTimeout(() => { copyBtn.textContent = "Sao chép link Discord Shop"; }, 2000);
+        const url = `https://discord.com/shop#itemSkuId=${decor.sku_id}`;
+        const succeed = () => {
+            copyBtn.textContent = "Đã sao chép ✓";
+            setTimeout(() => { copyBtn.textContent = "Sao chép link Discord Shop"; }, 2000);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(succeed).catch(() => fallbackCopy(url, succeed));
+        } else {
+            fallbackCopy(url, succeed);
+        }
     });
 
     modal.classList.remove("hidden");
