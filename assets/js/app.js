@@ -447,10 +447,6 @@ function openModal(decor) {
     const isBundle = decor.type === 1000 && Array.isArray(decor.assetURL);
     const isImported = decor.decorFrom === "importedDecors";
 
-    const imgNode = isBundle
-        ? createBundleImgWrap(decor.assetURL, "modal-bundle-img")
-        : createDiscordProfileMock(decor);
-
     const limitedBadge = isImported
         ? `<span class="badge-limited">⚡ Decor Giới Hạn</span>`
         : "";
@@ -485,6 +481,10 @@ function openModal(decor) {
                 </button>
             </div>
         </div>`;
+
+    const imgNode = isBundle
+        ? createBundleImgWrap(decor.assetURL, "modal-bundle-img")
+        : createDiscordProfileMock(decor);
 
     document.getElementById("modalImgSlot").appendChild(imgNode);
 
