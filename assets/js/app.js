@@ -97,7 +97,7 @@ function createProfileEffectWrap(effects, cls) {
         }
     };
 
-    playCycle();
+    setTimeout(playCycle, 0);
     return wrap;
 }
 
