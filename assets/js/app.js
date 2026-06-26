@@ -176,8 +176,9 @@ function createDiscordProfileMock(decor, forCard = false) {
 
     const effectLayer = document.createElement("div");
     effectLayer.className = "dp-effect-layer";
-    if (forCard) {
-        // Card: chỉ dùng ảnh tĩnh, không load effect frames
+
+    const loadStatic = () => {
+        effectLayer.innerHTML = "";
         if (decor.staticURL) {
             const img = document.createElement("img");
             img.src = decor.staticURL;
@@ -185,20 +186,20 @@ function createDiscordProfileMock(decor, forCard = false) {
             img.style.cssText = "width:100%;height:100%;object-fit:cover;";
             effectLayer.appendChild(img);
         }
-    } else {
-        // Modal: load full animated effects từ đầu
+    };
+
+    const loadAnimated = () => {
+        effectLayer.innerHTML = "";
         if (decor.effects && decor.effects.length) {
-            const effectWrap = createProfileEffectWrap(decor.effects, "");
-            effectWrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
-            effectLayer.appendChild(effectWrap);
-        } else if (decor.staticURL) {
-            const img = document.createElement("img");
-            img.src = decor.staticURL;
-            img.alt = "";
-            img.style.cssText = "width:100%;height:100%;object-fit:cover;";
-            effectLayer.appendChild(img);
+            const wrap = createProfileEffectWrap(decor.effects, "");
+            wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
+            effectLayer.appendChild(wrap);
+        } else {
+            loadStatic();
         }
-    }
+    };
+
+    loadStatic();
     preview.appendChild(effectLayer);
 
     const profileImg = document.createElement("img");
@@ -207,11 +208,16 @@ function createDiscordProfileMock(decor, forCard = false) {
     profileImg.alt = "";
     preview.appendChild(profileImg);
 
-    if (!forCard) return preview;
+    if (!forCard) {
+        loadAnimated();
+        return preview;
+    }
 
     const crop = document.createElement("div");
     crop.className = "dp-profile-crop";
     crop.appendChild(preview);
+    crop.addEventListener("mouseenter", loadAnimated);
+    crop.addEventListener("mouseleave", loadStatic);
     return crop;
 }
 
