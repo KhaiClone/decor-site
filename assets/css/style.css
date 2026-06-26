@@ -914,41 +914,187 @@ body.modal-open { overflow: hidden; }
     border-radius: 3px;
 }
 
-/* Avatar-only view (type 0) */
-.discord-profile-mock--square { aspect-ratio: 1; }
-
-.dp-avatar-center {
+/* ─── Avatar decoration preview (type 0) ──────────────── */
+.dp-avatar-preview {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 1;
+    background: var(--surface);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.dp-avatar--lg {
-    width: 62%;
+#modalImgSlot .dp-avatar-preview {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
 }
 
-.dp-avatar--lg .dp-status {
-    width: 18%;
-    height: 18%;
-    border-width: 3px;
-}
-
-/* Nameplate-only view (type 2) */
-.dp-nameplate-center {
-    width: 100%;
-    height: 100%;
+.dp-avatar-base {
+    position: absolute;
+    width: 46%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #5865f2;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 15%;
+    color: rgba(255, 255, 255, 0.45);
+    z-index: 0;
+}
+
+.dp-avatar-base .dp-avatar-icon {
+    width: 55%;
+    height: 55%;
+}
+
+.dp-status--avatar {
+    width: 22%;
+    height: 22%;
+    background: #23a55a;
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+    position: absolute;
+    bottom: 4%;
+    right: 4%;
+}
+
+.dp-deco-img {
+    position: absolute;
+    width: 88%;
+    height: 88%;
+    object-fit: contain;
+    z-index: 1;
+}
+
+/* ─── Profile effect square crop (type 1 card) ─────────── */
+.dp-profile-crop {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+/* ─── Nameplate chat preview (type 2) ──────────────────── */
+.dp-chat-preview {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #1e1f22;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2%;
+    padding: 8% 6%;
     box-sizing: border-box;
+    font-size: 11px;
 }
 
-.dp-nameplate-strip--full {
+#modalImgSlot .dp-chat-preview {
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.dp-chat-row {
+    display: flex;
+    align-items: center;
+    gap: 4%;
+    border-radius: 6px;
+    padding: 2% 3%;
+    flex-shrink: 0;
+}
+
+.dp-chat-row--dim {
+    height: 22%;
+    opacity: 0.3;
+}
+
+.dp-chat-row--main {
+    height: 30%;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dp-chat-av {
+    flex-shrink: 0;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.dp-chat-av--dim {
+    width: 15%;
+    background: #3a3d44;
+}
+
+.dp-chat-av--main {
+    width: 19%;
+    background: #5865f2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.dp-chat-av--main .dp-avatar-icon {
+    width: 55%;
+    height: 55%;
+}
+
+.dp-chat-av--main .dp-status {
+    width: 26%;
+    height: 26%;
+    border-width: 2px;
+}
+
+.dp-chat-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dp-chat-line {
+    height: 6px;
+    background: #3a3d44;
+    border-radius: 3px;
+}
+
+.dp-nameplate-bg {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(88, 101, 242, 0.15);
+}
+
+.dp-nameplate-bg video {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: 35%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dp-nameplate-pill {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 100px;
+    padding: 0.15em 0.8em;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #f2f3f5;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
 }
 
 /* ─── Responsive ───────────────────────────────────── */

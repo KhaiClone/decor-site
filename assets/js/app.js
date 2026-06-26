@@ -88,80 +88,108 @@ function createProfileEffectWrap(effects, cls) {
 
 const USER_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 4v1h16v-1c0-1.33-2.67-4-8-4z"/></svg>`;
 
-function createDiscordProfileMock(decor) {
-    // TYPE 0: just the decorated avatar
+function createDiscordProfileMock(decor, forCard = false) {
+    // TYPE 0: avatar circle behind decoration
     if (decor.type === 0) {
-        const mock = document.createElement("div");
-        mock.className = "discord-profile-mock discord-profile-mock--square";
+        const wrap = document.createElement("div");
+        wrap.className = "dp-avatar-preview";
 
-        const center = document.createElement("div");
-        center.className = "dp-avatar-center";
-
-        const avatar = document.createElement("div");
-        avatar.className = "dp-avatar dp-avatar--lg";
+        const avatarBg = document.createElement("div");
+        avatarBg.className = "dp-avatar-base";
 
         const iconWrap = document.createElement("div");
         iconWrap.className = "dp-avatar-icon";
         iconWrap.innerHTML = USER_ICON_SVG;
-        avatar.appendChild(iconWrap);
+        avatarBg.appendChild(iconWrap);
 
         const status = document.createElement("span");
-        status.className = "dp-status";
-        avatar.appendChild(status);
+        status.className = "dp-status--avatar";
+        avatarBg.appendChild(status);
+
+        wrap.appendChild(avatarBg);
 
         if (decor.assetURL) {
             const deco = document.createElement("img");
             deco.src = decor.assetURL;
-            deco.className = "dp-avatar-deco";
+            deco.className = "dp-deco-img";
             deco.alt = "";
-            avatar.appendChild(deco);
+            wrap.appendChild(deco);
         }
 
-        center.appendChild(avatar);
-        mock.appendChild(center);
-        return mock;
+        return wrap;
     }
 
-    // TYPE 2: just the nameplate strip
+    // TYPE 2: Discord DM-list style with nameplate row
     if (decor.type === 2) {
-        const mock = document.createElement("div");
-        mock.className = "discord-profile-mock discord-profile-mock--square";
+        const wrap = document.createElement("div");
+        wrap.className = "dp-chat-preview";
 
-        const center = document.createElement("div");
-        center.className = "dp-nameplate-center";
+        const dimRow = (lineWidths) => {
+            const row = document.createElement("div");
+            row.className = "dp-chat-row dp-chat-row--dim";
 
-        const strip = document.createElement("div");
-        strip.className = "dp-nameplate-strip dp-nameplate-strip--full";
+            const av = document.createElement("div");
+            av.className = "dp-chat-av dp-chat-av--dim";
+            row.appendChild(av);
 
+            const linesWrap = document.createElement("div");
+            linesWrap.className = "dp-chat-lines";
+            lineWidths.forEach((w) => {
+                const l = document.createElement("div");
+                l.className = "dp-chat-line";
+                l.style.width = w;
+                linesWrap.appendChild(l);
+            });
+            row.appendChild(linesWrap);
+            return row;
+        };
+
+        wrap.appendChild(dimRow(["65%", "40%"]));
+
+        // Nameplate row
+        const mainRow = document.createElement("div");
+        mainRow.className = "dp-chat-row dp-chat-row--main";
+
+        const mainAv = document.createElement("div");
+        mainAv.className = "dp-chat-av dp-chat-av--main";
+        const avIcon = document.createElement("div");
+        avIcon.className = "dp-avatar-icon";
+        avIcon.innerHTML = USER_ICON_SVG;
+        mainAv.appendChild(avIcon);
+        const avStatus = document.createElement("span");
+        avStatus.className = "dp-status";
+        mainAv.appendChild(avStatus);
+        mainRow.appendChild(mainAv);
+
+        const npArea = document.createElement("div");
+        npArea.className = "dp-nameplate-bg";
         if (decor.assetURL) {
             const video = document.createElement("video");
             video.src = decor.assetURL;
-            video.className = "dp-nameplate-video";
             video.autoplay = true;
             video.loop = true;
             video.muted = true;
             video.playsInline = true;
-            strip.appendChild(video);
+            npArea.appendChild(video);
         }
+        const pill = document.createElement("span");
+        pill.className = "dp-nameplate-pill";
+        pill.textContent = "DiscordUser";
+        npArea.appendChild(pill);
+        mainRow.appendChild(npArea);
 
-        const nameText = document.createElement("span");
-        nameText.className = "dp-nameplate-text";
-        nameText.textContent = "DiscordUser";
-        strip.appendChild(nameText);
+        wrap.appendChild(mainRow);
+        wrap.appendChild(dimRow(["50%", "75%"]));
 
-        center.appendChild(strip);
-        mock.appendChild(center);
-        return mock;
+        return wrap;
     }
 
-    // TYPE 1: full profile popup with effect
-    const isType1 = decor.type === 1;
-    const hasEffects = isType1 && decor.effects && decor.effects.length;
+    // TYPE 1: full profile popup
+    const hasEffects = decor.effects && decor.effects.length;
 
     const mock = document.createElement("div");
     mock.className = "discord-profile-mock";
 
-    // Type 1 with effects: animation fills entire background
     if (hasEffects) {
         const effectBg = createProfileEffectWrap(decor.effects, "");
         effectBg.style.cssText = "position:absolute;inset:0;overflow:hidden;z-index:0;";
@@ -172,10 +200,9 @@ function createDiscordProfileMock(decor) {
         mock.appendChild(overlay);
     }
 
-    // Banner (transparent for type 1 w/ effects; static img for type 1 w/o effects; blurple for 0/2)
     const banner = document.createElement("div");
     banner.className = hasEffects ? "dp-banner dp-banner--transparent" : "dp-banner";
-    if (isType1 && !hasEffects && decor.staticURL) {
+    if (!hasEffects && decor.staticURL) {
         const img = document.createElement("img");
         img.src = decor.staticURL;
         img.alt = "";
@@ -184,87 +211,42 @@ function createDiscordProfileMock(decor) {
     }
     mock.appendChild(banner);
 
-    // Body
     const body = document.createElement("div");
     body.className = hasEffects ? "dp-body dp-body--elevated" : "dp-body";
 
-    // Avatar
     const avatarRow = document.createElement("div");
     avatarRow.className = "dp-avatar-row";
 
     const avatar = document.createElement("div");
     avatar.className = "dp-avatar";
-
     const iconWrap = document.createElement("div");
     iconWrap.className = "dp-avatar-icon";
     iconWrap.innerHTML = USER_ICON_SVG;
     avatar.appendChild(iconWrap);
-
     const status = document.createElement("span");
     status.className = "dp-status";
     avatar.appendChild(status);
-
-    if (decor.type === 0 && decor.assetURL) {
-        const deco = document.createElement("img");
-        deco.src = decor.assetURL;
-        deco.className = "dp-avatar-deco";
-        deco.alt = "";
-        avatar.appendChild(deco);
-    }
-
     avatarRow.appendChild(avatar);
     body.appendChild(avatarRow);
 
-    // Name section
     const nameSection = document.createElement("div");
     nameSection.className = "dp-name-section";
-
-    if (decor.type === 2 && decor.assetURL) {
-        const strip = document.createElement("div");
-        strip.className = "dp-nameplate-strip";
-
-        const video = document.createElement("video");
-        video.src = decor.assetURL;
-        video.className = "dp-nameplate-video";
-        video.autoplay = true;
-        video.loop = true;
-        video.muted = true;
-        video.playsInline = true;
-        strip.appendChild(video);
-
-        const nameText = document.createElement("span");
-        nameText.className = "dp-nameplate-text";
-        nameText.textContent = "DiscordUser";
-        strip.appendChild(nameText);
-        nameSection.appendChild(strip);
-
-        const tag = document.createElement("span");
-        tag.className = "dp-tag";
-        tag.textContent = "#0000";
-        nameSection.appendChild(tag);
-    } else {
-        const username = document.createElement("span");
-        username.className = "dp-username";
-        username.textContent = "DiscordUser";
-        nameSection.appendChild(username);
-
-        const tag = document.createElement("span");
-        tag.className = "dp-tag";
-        tag.textContent = "#0000";
-        nameSection.appendChild(tag);
-    }
-
+    const username = document.createElement("span");
+    username.className = "dp-username";
+    username.textContent = "DiscordUser";
+    nameSection.appendChild(username);
+    const tag = document.createElement("span");
+    tag.className = "dp-tag";
+    tag.textContent = "#0000";
+    nameSection.appendChild(tag);
     body.appendChild(nameSection);
 
-    // About me placeholder
     const about = document.createElement("div");
     about.className = "dp-about";
-
     const aboutTitle = document.createElement("div");
     aboutTitle.className = "dp-about-title";
     aboutTitle.textContent = "Giới thiệu";
     about.appendChild(aboutTitle);
-
     const lines = document.createElement("div");
     lines.className = "dp-about-lines";
     [100, 72].forEach((w) => {
@@ -275,8 +257,16 @@ function createDiscordProfileMock(decor) {
     });
     about.appendChild(lines);
     body.appendChild(about);
-
     mock.appendChild(body);
+
+    // Card: wrap in square crop container to show only the top portion
+    if (forCard) {
+        const crop = document.createElement("div");
+        crop.className = "dp-profile-crop";
+        crop.appendChild(mock);
+        return crop;
+    }
+
     return mock;
 }
 
@@ -300,7 +290,7 @@ function renderCard(decor) {
         imgWrap.appendChild(createBundleImgWrap(decor.assetURL, "bundle-img-wrap"));
         card.appendChild(imgWrap);
     } else {
-        card.appendChild(createDiscordProfileMock(decor));
+        card.appendChild(createDiscordProfileMock(decor, true));
     }
 
     // Type badge (absolute, positioned relative to .card)
