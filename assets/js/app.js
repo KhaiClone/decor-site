@@ -187,26 +187,37 @@ function createDiscordProfileMock(decor, forCard = false) {
     const effectLayer = document.createElement("div");
     effectLayer.className = "dp-effect-layer";
 
-    const loadStatic = () => {
+    const loadLoop = () => {
         effectLayer.innerHTML = "";
-        if (decor.staticURL) {
-            const img = document.createElement("img");
-            img.src = decor.staticURL;
-            img.alt = "";
-            img.style.cssText = "width:100%;height:100%;object-fit:cover;";
-            effectLayer.appendChild(img);
+        const loopEffects = (decor.effects || []).filter(e => e.loop);
+        if (!loopEffects.length) {
+            if (decor.staticURL) {
+                const img = document.createElement("img");
+                img.src = decor.staticURL;
+                img.alt = "";
+                img.style.cssText = "width:100%;height:100%;object-fit:cover;";
+                effectLayer.appendChild(img);
+            }
+            return;
         }
+        [...loopEffects].sort((a, b) => a.zIndex - b.zIndex).forEach(effect => {
+            const img = document.createElement("img");
+            img.src = effect.src;
+            img.alt = "";
+            img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};`;
+            effectLayer.appendChild(img);
+        });
     };
 
     const loadAnimated = () => {
         effectLayer.innerHTML = "";
-        if (!decor.effects || !decor.effects.length) { loadStatic(); return; }
+        if (!decor.effects || !decor.effects.length) { loadLoop(); return; }
         const wrap = createProfileEffectWrap(decor.effects, "");
         wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
         effectLayer.appendChild(wrap);
     };
 
-    loadStatic();
+    loadLoop();
     preview.appendChild(effectLayer);
 
     const profileImg = document.createElement("img");
@@ -224,7 +235,7 @@ function createDiscordProfileMock(decor, forCard = false) {
     crop.className = "dp-profile-crop";
     crop.appendChild(preview);
     crop.addEventListener("mouseenter", loadAnimated);
-    crop.addEventListener("mouseleave", loadStatic);
+    crop.addEventListener("mouseleave", loadLoop);
     return crop;
 }
 
