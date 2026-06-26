@@ -43,12 +43,12 @@ function createBundleImgWrap(assetURL, cls) {
     base.src = assetURL[0];
     base.className = "bundle-img-base";
     base.alt = "";
-    /* const overlay = document.createElement("img");
+    const overlay = document.createElement("img");
     overlay.src = assetURL[1];
     overlay.className = "bundle-img-overlay";
-    overlay.alt = ""; */
+    overlay.alt = "";
     wrap.appendChild(base);
-    /* wrap.appendChild(overlay); */
+    wrap.appendChild(overlay);
     return wrap;
 }
 
@@ -66,7 +66,9 @@ function createProfileEffectWrap(effects, cls) {
     const entries = sorted.map((effect) => {
         const img = document.createElement("img");
         const sep = effect.src.includes("?") ? "&" : "?";
-        img.src = effect.loop ? effect.src : `${effect.src}${sep}_t=${Date.now()}`;
+        img.src = effect.loop
+            ? effect.src
+            : `${effect.src}${sep}_t=${Date.now()}`;
         img.alt = "";
         img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;transition:opacity 0.4s ease;`;
         wrap.appendChild(img);
@@ -189,7 +191,7 @@ function createDiscordProfileMock(decor, forCard = false) {
 
     const loadLoop = () => {
         effectLayer.innerHTML = "";
-        const loopEffects = (decor.effects || []).filter(e => e.loop);
+        const loopEffects = (decor.effects || []).filter((e) => e.loop);
         if (!loopEffects.length) {
             if (decor.staticURL) {
                 const img = document.createElement("img");
@@ -200,18 +202,23 @@ function createDiscordProfileMock(decor, forCard = false) {
             }
             return;
         }
-        [...loopEffects].sort((a, b) => a.zIndex - b.zIndex).forEach(effect => {
-            const img = document.createElement("img");
-            img.src = effect.src;
-            img.alt = "";
-            img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};`;
-            effectLayer.appendChild(img);
-        });
+        [...loopEffects]
+            .sort((a, b) => a.zIndex - b.zIndex)
+            .forEach((effect) => {
+                const img = document.createElement("img");
+                img.src = effect.src;
+                img.alt = "";
+                img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};`;
+                effectLayer.appendChild(img);
+            });
     };
 
     const loadAnimated = () => {
         effectLayer.innerHTML = "";
-        if (!decor.effects || !decor.effects.length) { loadLoop(); return; }
+        if (!decor.effects || !decor.effects.length) {
+            loadLoop();
+            return;
+        }
         const wrap = createProfileEffectWrap(decor.effects, "");
         wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
         effectLayer.appendChild(wrap);
@@ -256,7 +263,9 @@ function renderCard(decor) {
     if (isBundle) {
         const imgWrap = document.createElement("div");
         imgWrap.className = "card-img-wrap";
-        imgWrap.appendChild(createBundleImgWrap(decor.assetURL, "bundle-img-wrap"));
+        imgWrap.appendChild(
+            createBundleImgWrap(decor.assetURL, "bundle-img-wrap"),
+        );
         card.appendChild(imgWrap);
     } else {
         card.appendChild(createDiscordProfileMock(decor, true));
@@ -487,7 +496,10 @@ function fallbackCopy(text, onSuccess) {
     document.body.appendChild(ta);
     ta.focus();
     ta.select();
-    try { document.execCommand("copy"); onSuccess(); } catch (_) {}
+    try {
+        document.execCommand("copy");
+        onSuccess();
+    } catch (_) {}
     document.body.removeChild(ta);
 }
 
@@ -545,10 +557,15 @@ function openModal(decor) {
         const url = `https://discord.com/shop#itemSkuId=${decor.sku_id}`;
         const succeed = () => {
             copyBtn.textContent = "Đã sao chép ✓";
-            setTimeout(() => { copyBtn.textContent = "Sao chép link Discord Shop"; }, 2000);
+            setTimeout(() => {
+                copyBtn.textContent = "Sao chép link Discord Shop";
+            }, 2000);
         };
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).then(succeed).catch(() => fallbackCopy(url, succeed));
+            navigator.clipboard
+                .writeText(url)
+                .then(succeed)
+                .catch(() => fallbackCopy(url, succeed));
         } else {
             fallbackCopy(url, succeed);
         }
