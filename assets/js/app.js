@@ -73,11 +73,6 @@ function createProfileEffectWrap(effects, cls) {
         return { img, effect };
     });
 
-    const nonLoop = effects.filter(e => !e.loop);
-    const cycleEnd = nonLoop.length
-        ? Math.max(...nonLoop.map(e => (e.start || 0) + (e.duration || 0)))
-        : 0;
-
     const playCycle = () => {
         if (!wrap.isConnected) return;
         entries.forEach(({ img, effect }) => {
@@ -93,9 +88,6 @@ function createProfileEffectWrap(effects, cls) {
                 }
             }, effect.start);
         });
-        if (cycleEnd > 0) {
-            setTimeout(() => playCycle(), cycleEnd + 500);
-        }
     };
 
     setTimeout(playCycle, 0);
