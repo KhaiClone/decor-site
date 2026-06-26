@@ -176,16 +176,28 @@ function createDiscordProfileMock(decor, forCard = false) {
 
     const effectLayer = document.createElement("div");
     effectLayer.className = "dp-effect-layer";
-    if (decor.effects && decor.effects.length) {
-        const effectWrap = createProfileEffectWrap(decor.effects, "");
-        effectWrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
-        effectLayer.appendChild(effectWrap);
-    } else if (decor.staticURL) {
-        const img = document.createElement("img");
-        img.src = decor.staticURL;
-        img.alt = "";
-        img.style.cssText = "width:100%;height:100%;object-fit:cover;";
-        effectLayer.appendChild(img);
+    if (forCard) {
+        // Card: chỉ dùng ảnh tĩnh, không load effect frames
+        if (decor.staticURL) {
+            const img = document.createElement("img");
+            img.src = decor.staticURL;
+            img.alt = "";
+            img.style.cssText = "width:100%;height:100%;object-fit:cover;";
+            effectLayer.appendChild(img);
+        }
+    } else {
+        // Modal: load full animated effects từ đầu
+        if (decor.effects && decor.effects.length) {
+            const effectWrap = createProfileEffectWrap(decor.effects, "");
+            effectWrap.style.cssText = "position:absolute;inset:0;overflow:hidden;";
+            effectLayer.appendChild(effectWrap);
+        } else if (decor.staticURL) {
+            const img = document.createElement("img");
+            img.src = decor.staticURL;
+            img.alt = "";
+            img.style.cssText = "width:100%;height:100%;object-fit:cover;";
+            effectLayer.appendChild(img);
+        }
     }
     preview.appendChild(effectLayer);
 
