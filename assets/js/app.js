@@ -53,6 +53,7 @@ function createBundleImgWrap(assetURL, cls) {
 }
 
 // Full timing animation cho profile effect (type 1)
+// effects[x].src là ảnh (PNG/WebP/APNG) từ Discord CDN
 function createProfileEffectWrap(effects, cls) {
     const wrap = document.createElement("div");
     wrap.className = cls;
@@ -63,23 +64,16 @@ function createProfileEffectWrap(effects, cls) {
     const sorted = [...effects].sort((a, b) => a.zIndex - b.zIndex);
 
     sorted.forEach((effect) => {
-        const video = document.createElement("video");
-        video.src = effect.src;
-        video.muted = true;
-        video.playsInline = true;
-        video.loop = effect.loop;
-        video.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;`;
-        wrap.appendChild(video);
+        const img = document.createElement("img");
+        img.src = effect.src;
+        img.alt = "";
+        img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;`;
+        wrap.appendChild(img);
 
         setTimeout(() => {
-            video.style.opacity = "1";
-            video.play().catch(() => {});
-
+            img.style.opacity = "1";
             if (!effect.loop) {
-                setTimeout(() => {
-                    video.style.opacity = "0";
-                    video.pause();
-                }, effect.duration);
+                setTimeout(() => { img.style.opacity = "0"; }, effect.duration);
             }
         }, effect.start);
     });
@@ -369,7 +363,7 @@ function openModal(decor) {
     modalContent.innerHTML = `
         <div class="modal-layout">
             <div class="modal-img-side">
-                <div id="modalImgSlot"></div>
+                <div id="modalImgSlot" style="width:100%"></div>
                 ${limitedBadge}
             </div>
             <div class="modal-info-side">
