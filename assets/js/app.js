@@ -65,7 +65,8 @@ function createProfileEffectWrap(effects, cls) {
     const sorted = [...effects].sort((a, b) => a.zIndex - b.zIndex);
     const entries = sorted.map((effect) => {
         const img = document.createElement("img");
-        img.src = effect.src;
+        const sep = effect.src.includes("?") ? "&" : "?";
+        img.src = effect.loop ? effect.src : `${effect.src}${sep}_t=${Date.now()}`;
         img.alt = "";
         img.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;transition:opacity 0.4s ease;`;
         wrap.appendChild(img);
