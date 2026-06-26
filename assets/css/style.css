@@ -1066,7 +1066,7 @@ body.modal-open { overflow: hidden; }
     flex: 1;
     height: 100%;
     position: relative;
-    border-radius: 100px;
+    border-radius: 12px;
     overflow: hidden;
     display: flex;
     align-items: center;
