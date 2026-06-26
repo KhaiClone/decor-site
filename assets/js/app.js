@@ -52,6 +52,41 @@ function createBundleImgWrap(assetURL, cls) {
     return wrap;
 }
 
+// Full timing animation cho profile effect (type 1)
+function createProfileEffectWrap(effects, cls) {
+    const wrap = document.createElement("div");
+    wrap.className = cls;
+    wrap.style.cssText = "position:relative;width:100%;height:100%;overflow:hidden;";
+
+    if (!effects || !effects.length) return wrap;
+
+    const sorted = [...effects].sort((a, b) => a.zIndex - b.zIndex);
+
+    sorted.forEach((effect) => {
+        const video = document.createElement("video");
+        video.src = effect.src;
+        video.muted = true;
+        video.playsInline = true;
+        video.loop = effect.loop;
+        video.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:${effect.zIndex};opacity:0;`;
+        wrap.appendChild(video);
+
+        setTimeout(() => {
+            video.style.opacity = "1";
+            video.play().catch(() => {});
+
+            if (!effect.loop) {
+                setTimeout(() => {
+                    video.style.opacity = "0";
+                    video.pause();
+                }, effect.duration);
+            }
+        }, effect.start);
+    });
+
+    return wrap;
+}
+
 // ─── Card rendering ────────────────────────────────────
 
 function renderCard(decor) {
@@ -68,7 +103,18 @@ function renderCard(decor) {
 
     if (isBundle) {
         imgWrap.appendChild(createBundleImgWrap(decor.assetURL, "bundle-img-wrap"));
-    } else if (typeof decor.assetURL === "string" && decor.assetURL.endsWith(".webm")) {
+    } else if (decor.type === 1) {
+        if (decor.effects && decor.effects.length) {
+            imgWrap.appendChild(createProfileEffectWrap(decor.effects, "profile-effect-wrap card-img"));
+        } else {
+            const img = document.createElement("img");
+            img.src = decor.staticURL;
+            img.className = "card-img";
+            img.alt = decor.name;
+            img.loading = "lazy";
+            imgWrap.appendChild(img);
+        }
+    } else if (decor.type === 2) {
         const video = document.createElement("video");
         video.src = decor.assetURL;
         video.className = "card-img";
@@ -270,11 +316,23 @@ function openModal(decor) {
     const isBundle   = decor.type === 1000 && Array.isArray(decor.assetURL);
     const isImported = decor.decorFrom === "importedDecors";
 
-    // Build image element as DOM node
     let imgNode;
     if (isBundle) {
         imgNode = createBundleImgWrap(decor.assetURL, "modal-bundle-img");
-    } else if (typeof decor.assetURL === "string" && decor.assetURL.endsWith(".webm")) {
+    } else if (decor.type === 1) {
+        const wrap = document.createElement("div");
+        wrap.className = "modal-img-wrap";
+        if (decor.effects && decor.effects.length) {
+            wrap.appendChild(createProfileEffectWrap(decor.effects, "modal-img"));
+        } else {
+            const img = document.createElement("img");
+            img.src = decor.staticURL;
+            img.className = "modal-img";
+            img.alt = decor.name;
+            wrap.appendChild(img);
+        }
+        imgNode = wrap;
+    } else if (decor.type === 2) {
         const wrap = document.createElement("div");
         wrap.className = "modal-img-wrap";
         const video = document.createElement("video");
@@ -335,7 +393,6 @@ function openModal(decor) {
             </div>
         </div>`;
 
-    // Inject the image DOM node (avoids innerHTML XSS with dynamic URLs)
     document.getElementById("modalImgSlot").appendChild(imgNode);
 
     modal.classList.remove("hidden");
