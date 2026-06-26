@@ -469,16 +469,20 @@ function openModal(decor) {
                     <div class="prices-table">${buildPricesHTML(decor)}</div>
                 </div>
                 ${buildBundleItemsHTML(decor)}
-                <a href="https://discord.com/shop#itemSkuId=${decor.sku_id}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="discord-link">
-                    Xem trên Discord Shop ↗
-                </a>
+                <button id="shopCopyBtn" class="discord-link">
+                    Sao chép link Discord Shop
+                </button>
             </div>
         </div>`;
 
     document.getElementById("modalImgSlot").appendChild(imgNode);
+
+    const copyBtn = document.getElementById("shopCopyBtn");
+    copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(`https://discord.com/shop#itemSkuId=${decor.sku_id}`);
+        copyBtn.textContent = "Đã sao chép ✓";
+        setTimeout(() => { copyBtn.textContent = "Sao chép link Discord Shop"; }, 2000);
+    });
 
     modal.classList.remove("hidden");
     document.body.classList.add("modal-open");

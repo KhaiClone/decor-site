@@ -804,7 +804,8 @@ body.modal-open {
     color: #7289da;
     font-size: 13px;
     font-weight: 600;
-    text-decoration: none;
+    font-family: inherit;
+    cursor: pointer;
     transition: all var(--transition);
     margin-top: 4px;
 }
