@@ -1036,7 +1036,6 @@ body.modal-open { overflow: hidden; }
 
 .dp-chat-row--main {
     height: 30%;
-    background: rgba(255, 255, 255, 0.05);
 }
 
 .dp-chat-av {
@@ -1048,26 +1047,6 @@ body.modal-open { overflow: hidden; }
 .dp-chat-av--dim {
     width: 15%;
     background: #3a3d44;
-}
-
-.dp-chat-av--main {
-    width: 19%;
-    position: relative;
-    overflow: hidden;
-}
-
-.dp-chat-av--main img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    display: block;
-}
-
-.dp-chat-av--main .dp-status {
-    width: 26%;
-    height: 26%;
-    border-width: 2px;
 }
 
 .dp-chat-lines {
@@ -1087,11 +1066,13 @@ body.modal-open { overflow: hidden; }
     flex: 1;
     height: 100%;
     position: relative;
-    border-radius: 6px;
+    border-radius: 100px;
     overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 5%;
+    padding: 0 8% 0 4%;
+    box-sizing: border-box;
     background: rgba(88, 101, 242, 0.15);
 }
 
@@ -1103,18 +1084,40 @@ body.modal-open { overflow: hidden; }
     object-fit: cover;
 }
 
+.dp-nameplate-av {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    height: 78%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.dp-nameplate-av img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.dp-nameplate-av .dp-status {
+    width: 32%;
+    height: 32%;
+    border-width: 1px;
+    border-color: transparent;
+}
+
 .dp-nameplate-pill {
     position: relative;
     z-index: 1;
-    background: rgba(255, 255, 255, 0.18);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 100px;
-    padding: 0.15em 0.8em;
-    font-size: 0.9em;
+    font-size: 0.85em;
     font-weight: 600;
-    color: #f2f3f5;
+    color: rgba(255, 255, 255, 0.7);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ─── Responsive ───────────────────────────────────── */

@@ -141,19 +141,9 @@ function createDiscordProfileMock(decor, forCard = false) {
         const mainRow = document.createElement("div");
         mainRow.className = "dp-chat-row dp-chat-row--main";
 
-        const mainAv = document.createElement("div");
-        mainAv.className = "dp-chat-av dp-chat-av--main";
-        const avImg = document.createElement("img");
-        avImg.src = "assets/img/nameplate.png";
-        avImg.alt = "";
-        mainAv.appendChild(avImg);
-        const avStatus = document.createElement("span");
-        avStatus.className = "dp-status";
-        mainAv.appendChild(avStatus);
-        mainRow.appendChild(mainAv);
-
         const npArea = document.createElement("div");
         npArea.className = "dp-nameplate-bg";
+
         if (decor.assetURL) {
             const video = document.createElement("video");
             video.src = decor.assetURL;
@@ -163,10 +153,23 @@ function createDiscordProfileMock(decor, forCard = false) {
             video.playsInline = true;
             npArea.appendChild(video);
         }
+
+        const npAv = document.createElement("div");
+        npAv.className = "dp-nameplate-av";
+        const avImg = document.createElement("img");
+        avImg.src = "assets/img/nameplate.png";
+        avImg.alt = "";
+        npAv.appendChild(avImg);
+        const avStatus = document.createElement("span");
+        avStatus.className = "dp-status";
+        npAv.appendChild(avStatus);
+        npArea.appendChild(npAv);
+
         const pill = document.createElement("span");
         pill.className = "dp-nameplate-pill";
         pill.textContent = "DiscordUser";
         npArea.appendChild(pill);
+
         mainRow.appendChild(npArea);
 
         wrap.appendChild(mainRow);
