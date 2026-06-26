@@ -914,6 +914,43 @@ body.modal-open { overflow: hidden; }
     border-radius: 3px;
 }
 
+/* Avatar-only view (type 0) */
+.discord-profile-mock--square { aspect-ratio: 1; }
+
+.dp-avatar-center {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dp-avatar--lg {
+    width: 62%;
+}
+
+.dp-avatar--lg .dp-status {
+    width: 18%;
+    height: 18%;
+    border-width: 3px;
+}
+
+/* Nameplate-only view (type 2) */
+.dp-nameplate-center {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15%;
+    box-sizing: border-box;
+}
+
+.dp-nameplate-strip--full {
+    width: 100%;
+    height: 35%;
+}
+
 /* ─── Responsive ───────────────────────────────────── */
 @media (max-width: 900px) {
     .modal-layout {

@@ -89,6 +89,72 @@ function createProfileEffectWrap(effects, cls) {
 const USER_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 4v1h16v-1c0-1.33-2.67-4-8-4z"/></svg>`;
 
 function createDiscordProfileMock(decor) {
+    // TYPE 0: just the decorated avatar
+    if (decor.type === 0) {
+        const mock = document.createElement("div");
+        mock.className = "discord-profile-mock discord-profile-mock--square";
+
+        const center = document.createElement("div");
+        center.className = "dp-avatar-center";
+
+        const avatar = document.createElement("div");
+        avatar.className = "dp-avatar dp-avatar--lg";
+
+        const iconWrap = document.createElement("div");
+        iconWrap.className = "dp-avatar-icon";
+        iconWrap.innerHTML = USER_ICON_SVG;
+        avatar.appendChild(iconWrap);
+
+        const status = document.createElement("span");
+        status.className = "dp-status";
+        avatar.appendChild(status);
+
+        if (decor.assetURL) {
+            const deco = document.createElement("img");
+            deco.src = decor.assetURL;
+            deco.className = "dp-avatar-deco";
+            deco.alt = "";
+            avatar.appendChild(deco);
+        }
+
+        center.appendChild(avatar);
+        mock.appendChild(center);
+        return mock;
+    }
+
+    // TYPE 2: just the nameplate strip
+    if (decor.type === 2) {
+        const mock = document.createElement("div");
+        mock.className = "discord-profile-mock discord-profile-mock--square";
+
+        const center = document.createElement("div");
+        center.className = "dp-nameplate-center";
+
+        const strip = document.createElement("div");
+        strip.className = "dp-nameplate-strip dp-nameplate-strip--full";
+
+        if (decor.assetURL) {
+            const video = document.createElement("video");
+            video.src = decor.assetURL;
+            video.className = "dp-nameplate-video";
+            video.autoplay = true;
+            video.loop = true;
+            video.muted = true;
+            video.playsInline = true;
+            strip.appendChild(video);
+        }
+
+        const nameText = document.createElement("span");
+        nameText.className = "dp-nameplate-text";
+        nameText.textContent = "DiscordUser";
+        strip.appendChild(nameText);
+
+        center.appendChild(strip);
+        mock.appendChild(center);
+        return mock;
+    }
+
+    // TYPE 1: full profile popup with effect
     const isType1 = decor.type === 1;
     const hasEffects = isType1 && decor.effects && decor.effects.length;
 
