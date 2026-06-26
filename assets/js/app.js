@@ -68,6 +68,15 @@ function renderCard(decor) {
 
     if (isBundle) {
         imgWrap.appendChild(createBundleImgWrap(decor.assetURL, "bundle-img-wrap"));
+    } else if (typeof decor.assetURL === "string" && decor.assetURL.endsWith(".webm")) {
+        const video = document.createElement("video");
+        video.src = decor.assetURL;
+        video.className = "card-img";
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        imgWrap.appendChild(video);
     } else {
         const img = document.createElement("img");
         img.src = decor.assetURL;
@@ -265,6 +274,18 @@ function openModal(decor) {
     let imgNode;
     if (isBundle) {
         imgNode = createBundleImgWrap(decor.assetURL, "modal-bundle-img");
+    } else if (typeof decor.assetURL === "string" && decor.assetURL.endsWith(".webm")) {
+        const wrap = document.createElement("div");
+        wrap.className = "modal-img-wrap";
+        const video = document.createElement("video");
+        video.src = decor.assetURL;
+        video.className = "modal-img";
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        wrap.appendChild(video);
+        imgNode = wrap;
     } else {
         const wrap = document.createElement("div");
         wrap.className = "modal-img-wrap";
