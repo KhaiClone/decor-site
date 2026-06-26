@@ -84,6 +84,136 @@ function createProfileEffectWrap(effects, cls) {
     return wrap;
 }
 
+// ─── Discord profile mockup ────────────────────────────
+
+const USER_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 4v1h16v-1c0-1.33-2.67-4-8-4z"/></svg>`;
+
+function createDiscordProfileMock(decor) {
+    const isType1 = decor.type === 1;
+    const hasEffects = isType1 && decor.effects && decor.effects.length;
+
+    const mock = document.createElement("div");
+    mock.className = "discord-profile-mock";
+
+    // Type 1 with effects: animation fills entire background
+    if (hasEffects) {
+        const effectBg = createProfileEffectWrap(decor.effects, "");
+        effectBg.style.cssText = "position:absolute;inset:0;overflow:hidden;z-index:0;";
+        mock.appendChild(effectBg);
+
+        const overlay = document.createElement("div");
+        overlay.className = "dp-effect-overlay";
+        mock.appendChild(overlay);
+    }
+
+    // Banner (transparent for type 1 w/ effects; static img for type 1 w/o effects; blurple for 0/2)
+    const banner = document.createElement("div");
+    banner.className = hasEffects ? "dp-banner dp-banner--transparent" : "dp-banner";
+    if (isType1 && !hasEffects && decor.staticURL) {
+        const img = document.createElement("img");
+        img.src = decor.staticURL;
+        img.alt = "";
+        img.style.cssText = "width:100%;height:100%;object-fit:cover;";
+        banner.appendChild(img);
+    }
+    mock.appendChild(banner);
+
+    // Body
+    const body = document.createElement("div");
+    body.className = hasEffects ? "dp-body dp-body--elevated" : "dp-body";
+
+    // Avatar
+    const avatarRow = document.createElement("div");
+    avatarRow.className = "dp-avatar-row";
+
+    const avatar = document.createElement("div");
+    avatar.className = "dp-avatar";
+
+    const iconWrap = document.createElement("div");
+    iconWrap.className = "dp-avatar-icon";
+    iconWrap.innerHTML = USER_ICON_SVG;
+    avatar.appendChild(iconWrap);
+
+    const status = document.createElement("span");
+    status.className = "dp-status";
+    avatar.appendChild(status);
+
+    if (decor.type === 0 && decor.assetURL) {
+        const deco = document.createElement("img");
+        deco.src = decor.assetURL;
+        deco.className = "dp-avatar-deco";
+        deco.alt = "";
+        avatar.appendChild(deco);
+    }
+
+    avatarRow.appendChild(avatar);
+    body.appendChild(avatarRow);
+
+    // Name section
+    const nameSection = document.createElement("div");
+    nameSection.className = "dp-name-section";
+
+    if (decor.type === 2 && decor.assetURL) {
+        const strip = document.createElement("div");
+        strip.className = "dp-nameplate-strip";
+
+        const video = document.createElement("video");
+        video.src = decor.assetURL;
+        video.className = "dp-nameplate-video";
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        strip.appendChild(video);
+
+        const nameText = document.createElement("span");
+        nameText.className = "dp-nameplate-text";
+        nameText.textContent = "DiscordUser";
+        strip.appendChild(nameText);
+        nameSection.appendChild(strip);
+
+        const tag = document.createElement("span");
+        tag.className = "dp-tag";
+        tag.textContent = "#0000";
+        nameSection.appendChild(tag);
+    } else {
+        const username = document.createElement("span");
+        username.className = "dp-username";
+        username.textContent = "DiscordUser";
+        nameSection.appendChild(username);
+
+        const tag = document.createElement("span");
+        tag.className = "dp-tag";
+        tag.textContent = "#0000";
+        nameSection.appendChild(tag);
+    }
+
+    body.appendChild(nameSection);
+
+    // About me placeholder
+    const about = document.createElement("div");
+    about.className = "dp-about";
+
+    const aboutTitle = document.createElement("div");
+    aboutTitle.className = "dp-about-title";
+    aboutTitle.textContent = "Giới thiệu";
+    about.appendChild(aboutTitle);
+
+    const lines = document.createElement("div");
+    lines.className = "dp-about-lines";
+    [100, 72].forEach((w) => {
+        const line = document.createElement("div");
+        line.className = "dp-about-line";
+        line.style.width = w + "%";
+        lines.appendChild(line);
+    });
+    about.appendChild(lines);
+    body.appendChild(about);
+
+    mock.appendChild(body);
+    return mock;
+}
+
 // ─── Card rendering ────────────────────────────────────
 
 function renderCard(decor) {
@@ -98,48 +228,16 @@ function renderCard(decor) {
     card.addEventListener("click", () => openModal(decor));
 
     // Image area
-    const imgWrap = document.createElement("div");
-    imgWrap.className = "card-img-wrap";
-
     if (isBundle) {
-        imgWrap.appendChild(
-            createBundleImgWrap(decor.assetURL, "bundle-img-wrap"),
-        );
-    } else if (decor.type === 1) {
-        if (decor.effects && decor.effects.length) {
-            imgWrap.appendChild(
-                createProfileEffectWrap(
-                    decor.effects,
-                    "profile-effect-wrap card-img",
-                ),
-            );
-        } else {
-            const img = document.createElement("img");
-            img.src = decor.staticURL;
-            img.className = "card-img";
-            img.alt = decor.name;
-            img.loading = "lazy";
-            imgWrap.appendChild(img);
-        }
-    } else if (decor.type === 2) {
-        const video = document.createElement("video");
-        video.src = decor.assetURL;
-        video.className = "card-img";
-        video.autoplay = true;
-        video.loop = true;
-        video.muted = true;
-        video.playsInline = true;
-        imgWrap.appendChild(video);
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "card-img-wrap";
+        imgWrap.appendChild(createBundleImgWrap(decor.assetURL, "bundle-img-wrap"));
+        card.appendChild(imgWrap);
     } else {
-        const img = document.createElement("img");
-        img.src = decor.assetURL;
-        img.className = "card-img";
-        img.alt = decor.name;
-        img.loading = "lazy";
-        imgWrap.appendChild(img);
+        card.appendChild(createDiscordProfileMock(decor));
     }
 
-    // Type badge (absolute)
+    // Type badge (absolute, positioned relative to .card)
     const badgeWrap = document.createElement("div");
     badgeWrap.className = "card-badge";
     const badge = document.createElement("span");
@@ -163,7 +261,6 @@ function renderCard(decor) {
     info.appendChild(name);
     info.appendChild(priceEl);
 
-    card.appendChild(imgWrap);
     card.appendChild(badgeWrap);
     card.appendChild(info);
     return card;
@@ -350,46 +447,9 @@ function openModal(decor) {
     const isBundle = decor.type === 1000 && Array.isArray(decor.assetURL);
     const isImported = decor.decorFrom === "importedDecors";
 
-    let imgNode;
-    if (isBundle) {
-        imgNode = createBundleImgWrap(decor.assetURL, "modal-bundle-img");
-    } else if (decor.type === 1) {
-        const wrap = document.createElement("div");
-        wrap.className = "modal-img-wrap";
-        if (decor.effects && decor.effects.length) {
-            wrap.appendChild(
-                createProfileEffectWrap(decor.effects, "modal-img"),
-            );
-        } else {
-            const img = document.createElement("img");
-            img.src = decor.staticURL;
-            img.className = "modal-img";
-            img.alt = decor.name;
-            wrap.appendChild(img);
-        }
-        imgNode = wrap;
-    } else if (decor.type === 2) {
-        const wrap = document.createElement("div");
-        wrap.className = "modal-img-wrap";
-        const video = document.createElement("video");
-        video.src = decor.assetURL;
-        video.className = "modal-img";
-        video.autoplay = true;
-        video.loop = true;
-        video.muted = true;
-        video.playsInline = true;
-        wrap.appendChild(video);
-        imgNode = wrap;
-    } else {
-        const wrap = document.createElement("div");
-        wrap.className = "modal-img-wrap";
-        const img = document.createElement("img");
-        img.src = decor.assetURL;
-        img.className = "modal-img";
-        img.alt = decor.name;
-        wrap.appendChild(img);
-        imgNode = wrap;
-    }
+    const imgNode = isBundle
+        ? createBundleImgWrap(decor.assetURL, "modal-bundle-img")
+        : createDiscordProfileMock(decor);
 
     const limitedBadge = isImported
         ? `<span class="badge-limited">⚡ Decor Giới Hạn</span>`
