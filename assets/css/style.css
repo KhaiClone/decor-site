@@ -1162,12 +1162,22 @@ body.modal-open {
     container-type: inline-size;
 }
 
+/* Khung crop profile: chỉ hiện nửa trên của profile.png (aspect-ratio
+   được JS gán) để frame chiếm tỉ lệ lớn hơn trong ô preview */
 .dp-frame-profile {
     width: 100%;
-    display: block;
     position: relative;
     z-index: 1;
     border-radius: 6px;
+    overflow: hidden;
+}
+
+.dp-frame-profile img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top;
 }
 
 .dp-frame-layer {

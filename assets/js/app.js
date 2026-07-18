@@ -10,6 +10,9 @@ const TYPE_INFO = {
 
 // profile.png: 900 x 1760
 const PROFILE_ASPECT = 1760 / 900;
+// Frame preview: chỉ hiện nửa trên của profile để frame to, dễ nhìn hơn
+// (frame Discord tự co theo chiều cao profile nên cắt ngắn vẫn hợp lệ).
+const FRAME_PROFILE_CROP = 0.5;
 
 let allDecors = [];
 let filteredDecors = [];
@@ -133,8 +136,9 @@ function createFramePreview(decor) {
 
     // Thu nhỏ stage để cả profile + phần frame tràn ra vừa khít ô vuông:
     // tổng bề rộng = w*(1 + 2*oh/iw), tổng chiều cao = w*(aspect + (ot+ob)/iw)
+    const croppedAspect = PROFILE_ASPECT * FRAME_PROFILE_CROP;
     const totalW = 1 + (2 * oh) / iw;
-    const totalH = PROFILE_ASPECT + (ot + ob) / iw;
+    const totalH = croppedAspect + (ot + ob) / iw;
     const wPct = Math.min(100 / totalW, 100 / totalH) * 0.96;
     stage.style.width = `${wPct}%`;
     // Layer absolute không tính vào layout nên phải bù margin để phần
@@ -143,11 +147,14 @@ function createFramePreview(decor) {
     stage.style.marginTop = `${(wPct * ot) / iw}%`;
     stage.style.marginBottom = `${(wPct * ob) / iw}%`;
 
+    const profileWrap = document.createElement("div");
+    profileWrap.className = "dp-frame-profile";
+    profileWrap.style.aspectRatio = `1 / ${croppedAspect}`;
     const profileImg = document.createElement("img");
     profileImg.src = "assets/img/profile.png";
-    profileImg.className = "dp-frame-profile";
     profileImg.alt = "";
-    stage.appendChild(profileImg);
+    profileWrap.appendChild(profileImg);
+    stage.appendChild(profileWrap);
 
     for (const layer of f.layers) {
         const img = document.createElement("img");
