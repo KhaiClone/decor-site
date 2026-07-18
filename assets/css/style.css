@@ -1163,13 +1163,16 @@ body.modal-open {
 }
 
 /* Khung crop profile: chỉ hiện nửa trên của profile.png (aspect-ratio
-   được JS gán) để frame chiếm tỉ lệ lớn hơn trong ô preview */
+   được JS gán) để frame chiếm tỉ lệ lớn hơn trong ô preview.
+   Nền đục bắt buộc: profile.png có nền trong suốt, không có nền thì
+   layer back sẽ "xuyên thấu" qua profile trông như nằm phía trước. */
 .dp-frame-profile {
     width: 100%;
     position: relative;
     z-index: 1;
     border-radius: 6px;
     overflow: hidden;
+    background: #2b2d31;
 }
 
 .dp-frame-profile img {
