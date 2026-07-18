@@ -692,9 +692,24 @@ document.addEventListener("keydown", (e) => {
 
 // ─── Init ──────────────────────────────────────────────
 
+// sku_id là Discord snowflake (chứa timestamp tạo) → dùng làm thứ tự ra mắt.
+// So bằng BigInt vì id 19 chữ số vượt độ chính xác của Number.
+function skuOrder(decor) {
+    try {
+        return BigInt(decor.sku_id);
+    } catch {
+        return 0n;
+    }
+}
+
 async function init() {
     try {
         allDecors = await getAllDecors();
+        // Mặc định: deco ra mắt gần đây nhất lên đầu
+        allDecors.sort((a, b) => {
+            const x = skuOrder(a), y = skuOrder(b);
+            return x > y ? -1 : x < y ? 1 : 0;
+        });
         loadingState.classList.add("hidden");
         applyFilters();
     } catch (err) {
