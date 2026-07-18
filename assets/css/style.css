@@ -19,6 +19,8 @@
     --profile-bg: rgba(16, 185, 129, 0.12);
     --nameplate: #f59e0b;
     --nameplate-bg: rgba(245, 158, 11, 0.12);
+    --frame: #ec4899;
+    --frame-bg: rgba(236, 72, 153, 0.12);
     --bundle: #8b5cf6;
     --bundle-bg: rgba(139, 92, 246, 0.12);
 
@@ -223,6 +225,9 @@ body.modal-open {
 }
 .dot-nameplate {
     background: var(--nameplate);
+}
+.dot-frame {
+    background: var(--frame);
 }
 .dot-bundle {
     background: var(--bundle);
@@ -455,6 +460,10 @@ body.modal-open {
 .badge-nameplate {
     color: var(--nameplate);
     background: var(--nameplate-bg);
+}
+.badge-frame {
+    color: var(--frame);
+    background: var(--frame-bg);
 }
 .badge-bundle {
     color: var(--bundle);
@@ -1126,6 +1135,80 @@ body.modal-open {
     border-radius: 10px;
 }
 
+/* ─── Frame preview (type 3) ───────────────────────────── */
+/* Ghép layer quanh profile.png theo cách Discord render frame:
+   mọi offset là tỉ lệ so với inner_width (bề rộng profile), nên dùng
+   container query units (cqw) trên stage. Các biến --iw/--ot/--ob/--oh
+   được JS gán từ decor.frame (inner_width / overflow_*). */
+.dp-frame-outer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background: #1e1f22;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modalImgSlot .dp-frame-outer {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.dp-frame-stage {
+    position: relative;
+    container-type: inline-size;
+}
+
+.dp-frame-profile {
+    width: 100%;
+    display: block;
+    position: relative;
+    z-index: 1;
+    border-radius: 6px;
+}
+
+.dp-frame-layer {
+    position: absolute;
+    max-width: none;
+    width: calc(100cqw + var(--oh) * 2 / var(--iw) * 100cqw);
+    left: calc(var(--oh) * -1 / var(--iw) * 100cqw);
+}
+
+.dp-frame-layer--top {
+    top: calc(var(--ot) * -1 / var(--iw) * 100cqw);
+}
+
+.dp-frame-layer--bottom {
+    bottom: calc(var(--ob) * -1 / var(--iw) * 100cqw);
+}
+
+/* Layer "rail" (anchor center, responsive): kéo giãn theo chiều cao profile */
+.dp-frame-layer--center {
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    object-fit: fill;
+}
+
+.dp-frame-layer--back {
+    z-index: 0;
+}
+
+.dp-frame-layer--front {
+    z-index: 2;
+}
+
+/* Fallback khi record không có frame.layers: dùng ảnh /preview nguyên */
+.dp-frame-fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8%;
+}
+
 /* ─── Nameplate chat preview (type 2) ──────────────────── */
 .dp-chat-preview {
     width: 100%;
@@ -1266,6 +1349,9 @@ body.modal-open {
     }
 
     .modal-img-side {
+        /* width tường minh: nội dung frame preview (container-type) có
+           intrinsic width = 0 nên không thể để grid item co theo content */
+        width: min(280px, 100%);
         max-width: 280px;
         margin: 0 auto;
     }

@@ -4,8 +4,12 @@ const TYPE_INFO = {
     0: { label: "Avatar Deco", color: "avatar" },
     1: { label: "Profile Effect", color: "profile" },
     2: { label: "Nameplate", color: "nameplate" },
+    3: { label: "Frame", color: "frame" },
     1000: { label: "Bundle", color: "bundle" },
 };
+
+// profile.png: 900 x 1760
+const PROFILE_ASPECT = 1760 / 900;
 
 let allDecors = [];
 let filteredDecors = [];
@@ -96,9 +100,81 @@ function createProfileEffectWrap(effects, cls) {
     return wrap;
 }
 
+// ─── Frame preview (type 3) ────────────────────────────
+// Ghép các layer của frame quanh profile.png giống cách Discord render:
+// layer URL = .../collectibles-shop/{sku_id}/{layer.id}/static, định vị
+// bằng inner_width + overflow_* (đều là px theo bề rộng chuẩn của profile).
+function createFramePreview(decor) {
+    const outer = document.createElement("div");
+    outer.className = "dp-frame-outer";
+
+    const f = decor.frame;
+    if (!f || !Array.isArray(f.layers) || f.layers.length === 0) {
+        // Record cũ / frame import thủ công: chỉ có ảnh /preview
+        const img = document.createElement("img");
+        img.src = decor.staticURL;
+        img.className = "dp-frame-fallback";
+        img.alt = "";
+        outer.appendChild(img);
+        return outer;
+    }
+
+    const iw = f.inner_width;
+    const ot = f.overflow_top;
+    const ob = f.overflow_bottom;
+    const oh = f.overflow_horizontal;
+
+    const stage = document.createElement("div");
+    stage.className = "dp-frame-stage";
+    stage.style.setProperty("--iw", iw);
+    stage.style.setProperty("--ot", ot);
+    stage.style.setProperty("--ob", ob);
+    stage.style.setProperty("--oh", oh);
+
+    // Thu nhỏ stage để cả profile + phần frame tràn ra vừa khít ô vuông:
+    // tổng bề rộng = w*(1 + 2*oh/iw), tổng chiều cao = w*(aspect + (ot+ob)/iw)
+    const totalW = 1 + (2 * oh) / iw;
+    const totalH = PROFILE_ASPECT + (ot + ob) / iw;
+    const wPct = Math.min(100 / totalW, 100 / totalH) * 0.96;
+    stage.style.width = `${wPct}%`;
+    // Layer absolute không tính vào layout nên phải bù margin để phần
+    // tràn trên/dưới không bị flex-center cắt mất (margin % = theo bề
+    // rộng của outer).
+    stage.style.marginTop = `${(wPct * ot) / iw}%`;
+    stage.style.marginBottom = `${(wPct * ob) / iw}%`;
+
+    const profileImg = document.createElement("img");
+    profileImg.src = "assets/img/profile.png";
+    profileImg.className = "dp-frame-profile";
+    profileImg.alt = "";
+    stage.appendChild(profileImg);
+
+    for (const layer of f.layers) {
+        const img = document.createElement("img");
+        img.src = `https://cdn.discordapp.com/media/v1/collectibles-shop/${decor.sku_id}/${layer.id}/static`;
+        img.alt = "";
+        img.className = `dp-frame-layer dp-frame-layer--${
+            layer.anchor === "top"
+                ? "top"
+                : layer.anchor === "bottom"
+                  ? "bottom"
+                  : "center"
+        } dp-frame-layer--${layer.order === "front" ? "front" : "back"}`;
+        stage.appendChild(img);
+    }
+
+    outer.appendChild(stage);
+    return outer;
+}
+
 // ─── Discord profile mockup ────────────────────────────
 
 function createDiscordProfileMock(decor, forCard = false) {
+    // TYPE 3: frame layers bao quanh ảnh demo profile
+    if (decor.type === 3) {
+        return createFramePreview(decor);
+    }
+
     // TYPE 0: avatar.png template + decoration overlay
     if (decor.type === 0) {
         const wrap = document.createElement("div");
