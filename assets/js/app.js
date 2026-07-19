@@ -791,9 +791,13 @@ function skuOrder(decor) {
 
 async function init() {
     try {
+        // typeof-guard: nếu trình duyệt còn cache api.js bản cũ (chưa có
+        // getDecorCategories) thì vẫn chạy được ở dạng lưới phẳng.
         [allDecors, allCategories] = await Promise.all([
             getAllDecors(),
-            getDecorCategories(),
+            typeof getDecorCategories === "function"
+                ? getDecorCategories()
+                : [],
         ]);
         // Mặc định: deco ra mắt gần đây nhất lên đầu
         allDecors.sort((a, b) => {
