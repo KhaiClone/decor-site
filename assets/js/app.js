@@ -1,4 +1,5 @@
 const ITEMS_PER_PAGE = 24;
+const CATEGORIES_PER_PAGE = 8;
 
 const TYPE_INFO = {
     0: { label: "Avatar Deco", color: "avatar" },
@@ -15,6 +16,7 @@ const PROFILE_ASPECT = 1760 / 900;
 const FRAME_PROFILE_CROP = 0.5;
 
 let allDecors = [];
+let allCategories = [];
 let filteredDecors = [];
 let currentPage = 1;
 let currentFilter = "all";
@@ -410,22 +412,107 @@ function render() {
 
     emptyState.classList.add("hidden");
     grid.classList.remove("hidden");
+    grid.innerHTML = "";
 
+    if (allCategories.length) renderGrouped();
+    else renderFlat();
+}
+
+// Lưới phẳng (fallback khi bot chưa có data categories)
+function renderFlat() {
+    grid.className = "grid";
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     const pageDecors = filteredDecors.slice(start, start + ITEMS_PER_PAGE);
-
-    grid.innerHTML = "";
     const fragment = document.createDocumentFragment();
     pageDecors.forEach((d) => fragment.appendChild(renderCard(d)));
     grid.appendChild(fragment);
+    renderPagination(Math.ceil(filteredDecors.length / ITEMS_PER_PAGE));
+}
 
-    renderPagination(total);
+// Nhóm theo mục, phân trang theo số mục
+function renderGrouped() {
+    grid.className = "category-sections";
+
+    const byCategory = new Map();
+    for (const d of filteredDecors) {
+        const key = d.category_sku_id || "__other";
+        if (!byCategory.has(key)) byCategory.set(key, []);
+        byCategory.get(key).push(d);
+    }
+
+    const sections = [];
+    for (const cat of allCategories) {
+        const items = byCategory.get(cat.sku_id);
+        if (items?.length) sections.push({ cat, items });
+        byCategory.delete(cat.sku_id);
+    }
+    // Deco không thuộc mục nào (import thủ công / record cũ) → "Khác"
+    const leftovers = [...byCategory.values()].flat();
+    if (leftovers.length) {
+        sections.push({ cat: { name: "Khác", banner: null }, items: leftovers });
+    }
+
+    const totalPages = Math.ceil(sections.length / CATEGORIES_PER_PAGE);
+    if (currentPage > totalPages) currentPage = 1;
+    const start = (currentPage - 1) * CATEGORIES_PER_PAGE;
+    const fragment = document.createDocumentFragment();
+    for (const { cat, items } of sections.slice(
+        start,
+        start + CATEGORIES_PER_PAGE,
+    )) {
+        fragment.appendChild(renderCategorySection(cat, items));
+    }
+    grid.appendChild(fragment);
+    renderPagination(totalPages);
+}
+
+function renderCategorySection(cat, items) {
+    const section = document.createElement("section");
+    section.className = "category-section";
+
+    if (cat.banner) {
+        // Banner Discord: desktop dùng catalog_banner_url, mobile dùng
+        // mobile_banner_url
+        const banner = document.createElement("div");
+        banner.className = "category-banner";
+        const picture = document.createElement("picture");
+        if (cat.mobileBanner) {
+            const source = document.createElement("source");
+            source.media = "(max-width: 640px)";
+            source.srcset = cat.mobileBanner;
+            picture.appendChild(source);
+        }
+        const img = document.createElement("img");
+        img.src = cat.banner;
+        img.alt = cat.name;
+        picture.appendChild(img);
+        banner.appendChild(picture);
+        section.appendChild(banner);
+    } else {
+        // Mục không có banner (Frames, Khác): header chữ
+        const header = document.createElement("div");
+        header.className = "category-header";
+        const h = document.createElement("h2");
+        h.className = "category-title";
+        h.textContent = cat.name;
+        const count = document.createElement("span");
+        count.className = "category-count";
+        count.textContent = `${items.length} item${items.length !== 1 ? "s" : ""}`;
+        header.appendChild(h);
+        header.appendChild(count);
+        section.appendChild(header);
+    }
+
+    const g = document.createElement("div");
+    g.className = "grid";
+    items.forEach((d) => g.appendChild(renderCard(d)));
+    section.appendChild(g);
+    return section;
 }
 
 // ─── Pagination ────────────────────────────────────────
 
-function renderPagination(total) {
-    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+function renderPagination(totalPages) {
     if (totalPages <= 1) {
         pagination.classList.add("hidden");
         return;
@@ -704,7 +791,10 @@ function skuOrder(decor) {
 
 async function init() {
     try {
-        allDecors = await getAllDecors();
+        [allDecors, allCategories] = await Promise.all([
+            getAllDecors(),
+            getDecorCategories(),
+        ]);
         // Mặc định: deco ra mắt gần đây nhất lên đầu
         allDecors.sort((a, b) => {
             const x = skuOrder(a), y = skuOrder(b);

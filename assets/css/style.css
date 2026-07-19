@@ -330,6 +330,50 @@ body.modal-open {
     }
 }
 
+/* ─── Category sections ────────────────────────────── */
+.category-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+    animation: fadeIn 0.3s ease;
+}
+
+.category-banner {
+    margin-bottom: 18px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--card);
+}
+
+.category-banner img {
+    width: 100%;
+    display: block;
+}
+
+.category-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    background: linear-gradient(90deg, var(--accent-glow), transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.category-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.category-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
 /* ─── Card ─────────────────────────────────────────── */
 .card {
     background: var(--card);

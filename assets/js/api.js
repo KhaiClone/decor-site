@@ -9,3 +9,15 @@ async function getAllDecors() {
     _cache = await res.json();
     return _cache;
 }
+
+// Danh sách mục (kèm banner). Trả [] nếu bot cũ chưa có endpoint —
+// site sẽ tự fallback về dạng lưới phẳng.
+async function getDecorCategories() {
+    try {
+        const res = await fetch(`${API_BASE}/api/decors/categories`);
+        if (!res.ok) return [];
+        return await res.json();
+    } catch {
+        return [];
+    }
+}
