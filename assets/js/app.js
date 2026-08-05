@@ -45,19 +45,44 @@ function getMinPrice(decor) {
     return decor.sellingPrices?.loginWithNitro ?? 0;
 }
 
-function createBundleImgWrap(assetURL, cls) {
+// Số nguyên RGB (855309) -> "#rrggbb"
+function intToHex(n) {
+    return "#" + ((n >>> 0) & 0xffffff).toString(16).padStart(6, "0");
+}
+
+function colorsToGradient(colors) {
+    const hex = colors.map(intToHex);
+    if (hex.length === 1) return hex[0];
+    return `linear-gradient(160deg, ${hex.join(", ")})`;
+}
+
+function createBundleImgWrap(decor, cls) {
+    const assetURL = decor.assetURL || [];
     const wrap = document.createElement("div");
     wrap.className = cls;
+
+    // Bundle 1 lớp (không có bg image): nền là gradient từ backgroundColors.
+    if (
+        !assetURL[1] &&
+        Array.isArray(decor.backgroundColors) &&
+        decor.backgroundColors.length
+    ) {
+        wrap.style.background = colorsToGradient(decor.backgroundColors);
+    }
+
     const base = document.createElement("img");
     base.src = assetURL[0];
     base.className = "bundle-img-base";
     base.alt = "";
-    const overlay = document.createElement("img");
-    overlay.src = assetURL[1];
-    overlay.className = "bundle-img-overlay";
-    overlay.alt = "";
     wrap.appendChild(base);
-    wrap.appendChild(overlay);
+
+    if (assetURL[1]) {
+        const overlay = document.createElement("img");
+        overlay.src = assetURL[1];
+        overlay.className = "bundle-img-overlay";
+        overlay.alt = "";
+        wrap.appendChild(overlay);
+    }
     return wrap;
 }
 
@@ -349,7 +374,7 @@ function renderCard(decor) {
         const imgWrap = document.createElement("div");
         imgWrap.className = "card-img-wrap";
         imgWrap.appendChild(
-            createBundleImgWrap(decor.assetURL, "bundle-img-wrap"),
+            createBundleImgWrap(decor, "bundle-img-wrap"),
         );
         card.appendChild(imgWrap);
     } else {
@@ -716,7 +741,7 @@ function openModal(decor) {
         </div>`;
 
     const imgNode = isBundle
-        ? createBundleImgWrap(decor.assetURL, "modal-bundle-img")
+        ? createBundleImgWrap(decor, "modal-bundle-img")
         : createDiscordProfileMock(decor);
 
     document.getElementById("modalImgSlot").appendChild(imgNode);
