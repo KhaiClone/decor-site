@@ -584,7 +584,6 @@ function getPageRange(current, total) {
 
 function buildPricesHTML(decor) {
     const isBundle = decor.type === 1000;
-    const isImported = decor.decorFrom === "importedDecors";
     const sp = decor.sellingPrices || {};
 
     const row = (label, origVal, sellVal, noGift = false) => {
@@ -614,7 +613,7 @@ function buildPricesHTML(decor) {
                 decor.prices?.withoutNitro,
                 sp.loginWithoutNitro,
             ),
-            row("🎁 Gift Bundle", null, sp.giftBundle, isImported),
+            row("🎁 Gift Bundle", null, sp.giftBundle, decor.noGift),
         ].join("");
     }
 
@@ -625,7 +624,7 @@ function buildPricesHTML(decor) {
             decor.prices?.withoutNitro,
             sp.loginWithoutNitro,
         ),
-        row("🎁 Gift", decor.prices?.withNitro, sp.gift, isImported),
+        row("🎁 Gift", decor.prices?.withNitro, sp.gift, decor.noGift),
     ].join("");
 }
 
