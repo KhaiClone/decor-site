@@ -52,13 +52,13 @@
     <main class="main container">
         <div id="loadingState" class="state-wrap">
             <div class="spinner"></div>
-            <p class="state-text">Đang tải dữ liệu từ bot...</p>
+            <p class="state-text">Đang tải dữ liệu decor...</p>
         </div>
 
         <div id="errorState" class="state-wrap hidden">
             <div class="state-icon">⚠</div>
-            <p class="state-text">Không thể kết nối đến bot.</p>
-            <p class="state-sub">Hãy đảm bảo ArnTo-assistant đang chạy và <code>EXPRESS=true</code> trong .env</p>
+            <p class="state-text">Không tải được dữ liệu decor.</p>
+            <p class="state-sub">Hãy thử lại sau ít phút.</p>
             <button onclick="location.reload()" class="retry-btn">Thử lại</button>
         </div>
 
@@ -82,7 +82,7 @@
         </div>
     </div>
 
-    <script src="assets/js/api.js?v=5"></script>
+    <script src="assets/js/api.js?v=6"></script>
     <script src="assets/js/app.js?v=4"></script>
 </body>
 </html>

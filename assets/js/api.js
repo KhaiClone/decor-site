@@ -1,14 +1,30 @@
-// Dữ liệu là bản chụp tĩnh (data/*.json) lấy từ API của ArnTo-assistant, deploy
-// cùng trang — trang không phụ thuộc vào VPS nào còn sống.
-const DATA_BASE = "data";
+// Dữ liệu sống lấy từ bot-panel qua /api của chính site (Vercel function, cache
+// ~1 phút ở edge — xem api/_panel.js). Nếu panel không trả lời, hoặc trang chạy
+// bằng server tĩnh không có /api, thì dùng bản chụp tĩnh data/*.json.
+const SOURCES = {
+    decors: ["api/decors", "data/decors.json"],
+    categories: ["api/decors/categories", "data/categories.json"],
+};
 
 let _cache = null;
 
+async function fetchFirst(urls) {
+    let lastError;
+    for (const url of urls) {
+        try {
+            const res = await fetch(url);
+            if (res.ok) return await res.json();
+            lastError = new Error(`API error: ${res.status}`);
+        } catch (err) {
+            lastError = err;
+        }
+    }
+    throw lastError;
+}
+
 async function getAllDecors() {
     if (_cache) return _cache;
-    const res = await fetch(`${DATA_BASE}/decors.json`);
-    if (!res.ok) throw new Error(`API error: ${res.status}`);
-    _cache = await res.json();
+    _cache = await fetchFirst(SOURCES.decors);
     return _cache;
 }
 
@@ -16,9 +32,7 @@ async function getAllDecors() {
 // site sẽ tự fallback về dạng lưới phẳng.
 async function getDecorCategories() {
     try {
-        const res = await fetch(`${DATA_BASE}/categories.json`);
-        if (!res.ok) return [];
-        return await res.json();
+        return await fetchFirst(SOURCES.categories);
     } catch {
         return [];
     }
